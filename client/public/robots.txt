@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /dashboard/
+Disallow: /api/
+
+Sitemap: https://zphs-anjangaon.mahaschool.gov.in/sitemap.xml
