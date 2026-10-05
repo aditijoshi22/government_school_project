@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import axios from 'axios';
 import PageHeader from '../components/common/PageHeader';
 import { SECTIONS_CONFIG } from '@shared/sections.config';
 import { Bell, Search, FileText, Download, AlertCircle } from 'lucide-react';
+import { getLocalizedText } from '../utils/bilingual';
 
 export default function Notices() {
+  const { i18n } = useTranslation();
   const [notices, setNotices] = useState([]);
   const [selectedSection, setSelectedSection] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
@@ -22,10 +25,17 @@ export default function Notices() {
       .finally(() => setLoading(false));
   }, [selectedSection]);
 
-  const filteredNotices = notices.filter(n =>
-    n.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    n.content.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredNotices = notices.filter(n => {
+    const titleText = getLocalizedText(n, 'title', i18n.language) || '';
+    const contentText = getLocalizedText(n, 'content', i18n.language) || '';
+    const term = searchTerm.toLowerCase();
+    return (
+      titleText.toLowerCase().includes(term) ||
+      contentText.toLowerCase().includes(term) ||
+      (n.title_en && n.title_en.toLowerCase().includes(term)) ||
+      (n.title_mr && n.title_mr.toLowerCase().includes(term))
+    );
+  });
 
   return (
     <div className="space-y-12 pb-16">
@@ -77,7 +87,7 @@ export default function Notices() {
             <Search className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
             <input
               type="text"
-              placeholder="Search notices..."
+              placeholder={i18n.language === 'mr' ? 'सूचना शोधा...' : 'Search notices...'}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full pl-9 pr-4 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white"
@@ -89,48 +99,52 @@ export default function Notices() {
         {/* Notices List */}
         <div className="space-y-4">
           {filteredNotices.length > 0 ? (
-            filteredNotices.map(notice => (
-              <div key={notice.id} className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-sm hover:shadow-md transition space-y-3">
-                <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
-                  <div className="flex items-center gap-2">
-                    {notice.is_important === 1 && (
-                      <span className="bg-rose-500 text-white font-extrabold text-[10px] px-2.5 py-0.5 rounded-full uppercase tracking-wider animate-pulse">
-                        Important
+            filteredNotices.map(notice => {
+              const noticeTitle = getLocalizedText(notice, 'title', i18n.language);
+              const noticeContent = getLocalizedText(notice, 'content', i18n.language);
+              return (
+                <div key={notice.id} className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-sm hover:shadow-md transition space-y-3">
+                  <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
+                    <div className="flex items-center gap-2">
+                      {notice.is_important === 1 && (
+                        <span className="bg-rose-500 text-white font-extrabold text-[10px] px-2.5 py-0.5 rounded-full uppercase tracking-wider animate-pulse">
+                          {i18n.language === 'mr' ? 'महत्त्वाचे' : 'Important'}
+                        </span>
+                      )}
+                      <span className="bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300 font-semibold px-2.5 py-0.5 rounded-full uppercase text-[10px]">
+                        {notice.category}
                       </span>
-                    )}
-                    <span className="bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300 font-semibold px-2.5 py-0.5 rounded-full uppercase text-[10px]">
-                      {notice.category}
-                    </span>
+                    </div>
+                    <span className="text-slate-400">{notice.created_at?.split('T')[0] || notice.created_at}</span>
                   </div>
-                  <span className="text-slate-400">{notice.created_at?.split('T')[0] || notice.created_at}</span>
+
+                  <h3 className="text-lg font-bold text-slate-900 dark:text-white leading-snug">
+                    {noticeTitle}
+                  </h3>
+                  <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                    {noticeContent}
+                  </p>
+
+                  {notice.attachment_url && (
+                    <div className="pt-2">
+                      <a
+                        href={notice.attachment_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-slate-900 dark:text-white font-bold text-xs px-4 py-2 rounded-xl transition border border-slate-200 dark:border-slate-700"
+                      >
+                        <FileText className="w-4 h-4 text-amber-500" />
+                        <span>{i18n.language === 'mr' ? 'शासकीय परिपत्रक (PDF) डाउनलोड करा' : 'Download Official PDF Circular'}</span>
+                        <Download className="w-3.5 h-3.5 text-slate-400 ml-1" />
+                      </a>
+                    </div>
+                  )}
                 </div>
-
-                <h3 className="text-lg font-bold text-slate-900 dark:text-white leading-snug">
-                  {notice.title}
-                </h3>
-                <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
-                  {notice.content}
-                </p>
-
-                {notice.attachment_url && (
-                  <div className="pt-2">
-                    <a
-                      href={notice.attachment_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-slate-900 dark:text-white font-bold text-xs px-4 py-2 rounded-xl transition border border-slate-200 dark:border-slate-700"
-                    >
-                      <FileText className="w-4 h-4 text-amber-500" />
-                      <span>Download Official PDF Circular</span>
-                      <Download className="w-3.5 h-3.5 text-slate-400 ml-1" />
-                    </a>
-                  </div>
-                )}
-              </div>
-            ))
+              );
+            })
           ) : (
             <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-12 text-center text-slate-400">
-              No notices matching your query.
+              {i18n.language === 'mr' ? 'कोणतीही सूचना सापडली नाही.' : 'No notices matching your query.'}
             </div>
           )}
         </div>

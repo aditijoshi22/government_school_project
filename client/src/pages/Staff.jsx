@@ -26,7 +26,7 @@ export default function Staff() {
       <PageHeader
         title="Faculty & Staff Directory"
         titleMr="शिक्षक व शिक्षकेतर कर्मचारी"
-        subtitle="Dedicated educators committed to academic excellence across Pre-Primary, Primary, and Higher Secondary."
+        subtitle="Dedicated educators committed to academic excellence across Primary, Secondary, and Higher Secondary."
         badgeText="Our Educators"
       />
 

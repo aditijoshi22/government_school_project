@@ -6,19 +6,27 @@ import schoolConfig from '@shared/school.config';
 import { SECTIONS_CONFIG } from '@shared/sections.config';
 import { Sparkles, BookOpen, GraduationCap, Award, Calendar, ArrowRight, Bell, Users, CheckCircle, MapPin, ChevronRight, FileText } from 'lucide-react';
 
+import { getLocalizedText } from '../utils/bilingual';
+
 export default function Home() {
   const { t, i18n } = useTranslation();
   const [homeData, setHomeData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [noticeError, setNoticeError] = useState(false);
 
   useEffect(() => {
+    setLoading(true);
     axios.get('/api/public/home')
       .then(res => {
         if (res.data.success) {
           setHomeData(res.data.data);
+          setNoticeError(false);
         }
       })
-      .catch(err => console.error(err))
+      .catch(err => {
+        console.error('Failed to load home data:', err);
+        setNoticeError(true);
+      })
       .finally(() => setLoading(false));
   }, []);
 
@@ -43,7 +51,7 @@ export default function Home() {
           <div className="lg:col-span-8 space-y-6">
             <span className="inline-flex items-center gap-2 bg-amber-400 text-slate-950 font-extrabold text-xs px-3.5 py-1.5 rounded-full uppercase tracking-wider shadow">
               <Sparkles className="w-3.5 h-3.5" />
-              Goverment Accredited • UDISE: {schoolConfig.udiseCode}
+              Government Accredited • UDISE: {schoolConfig.udiseCode}
             </span>
             <h1 className="text-3xl md:text-5xl font-extrabold tracking-tight leading-tight">
               {schoolConfig.name}
@@ -52,7 +60,7 @@ export default function Home() {
               {schoolConfig.nameMarathi}
             </p>
             <p className="text-slate-300 text-base md:text-lg max-w-2xl leading-relaxed">
-              Empowering students from Pre-Primary to Higher Secondary (Science, Commerce & Arts) with academic excellence, competitive scholarship coaching, and modern values.
+              Empowering students from Primary to Higher Secondary (Science, Commerce & Arts) with academic excellence, competitive scholarship coaching, and modern values.
             </p>
             <div className="flex flex-wrap gap-4 pt-2">
               <Link
@@ -77,25 +85,44 @@ export default function Home() {
             <div className="flex items-center justify-between border-b border-white/20 pb-3 mb-4">
               <div className="flex items-center gap-2 font-bold text-amber-400">
                 <Bell className="w-5 h-5 animate-bounce" />
-                <span>Latest Circulars & Notices</span>
+                <span>{i18n.language === 'mr' ? 'नवीनतम सूचना' : 'Latest Circulars & Notices'}</span>
               </div>
               <span className="text-[10px] bg-rose-500 text-white font-bold px-2 py-0.5 rounded-full">LIVE</span>
             </div>
             
             <div className="space-y-3 max-h-64 overflow-y-auto pr-1">
-              {homeData?.notices?.map((notice) => (
-                <div key={notice.id} className="bg-slate-950/60 p-3 rounded-xl border border-slate-800 text-xs space-y-1 hover:border-amber-400/50 transition">
-                  <div className="flex items-center justify-between text-[10px] text-slate-400">
-                    <span className="text-amber-400 font-semibold uppercase">{notice.category}</span>
-                    <span>{notice.created_at?.split('T')[0] || notice.created_at}</span>
-                  </div>
-                  <h4 className="font-semibold text-white leading-snug">{notice.title}</h4>
+              {loading ? (
+                <div className="text-center py-6 text-slate-400 text-xs animate-pulse">
+                  {i18n.language === 'mr' ? 'सूचना लोड होत आहेत...' : 'Loading notices...'}
                 </div>
-              ))}
+              ) : noticeError ? (
+                <div className="text-center py-6 text-rose-300 text-xs">
+                  {i18n.language === 'mr' ? 'सूचना लोड करण्यात अडचण आली.' : 'Unable to load notices.'}
+                </div>
+              ) : (!homeData?.notices || homeData.notices.length === 0) ? (
+                <div className="text-center py-6 text-slate-400 text-xs">
+                  {i18n.language === 'mr' ? 'कोणतीही सूचना उपलब्ध नाही.' : 'No notices available.'}
+                </div>
+              ) : (
+                homeData.notices.map((notice) => (
+                  <div key={notice.id} className="bg-slate-950/60 p-3 rounded-xl border border-slate-800 text-xs space-y-1 hover:border-amber-400/50 transition">
+                    <div className="flex items-center justify-between text-[10px] text-slate-400">
+                      <span className="text-amber-400 font-semibold uppercase">{notice.category}</span>
+                      <span>{notice.created_at?.split('T')[0] || notice.created_at}</span>
+                    </div>
+                    <h4 className="font-semibold text-white leading-snug">{getLocalizedText(notice, 'title', i18n.language)}</h4>
+                    {notice.attachment_url && (
+                      <a href={notice.attachment_url} target="_blank" rel="noreferrer" className="inline-block text-[10px] text-amber-300 underline pt-1">
+                        Download PDF
+                      </a>
+                    )}
+                  </div>
+                ))
+              )}
             </div>
 
             <Link to="/notices" className="block text-center text-xs font-bold text-amber-300 hover:text-white pt-4 transition">
-              View All Official Notices & Circulars →
+              {i18n.language === 'mr' ? 'सर्व शासकीय परिपत्रके पहा →' : 'View All Official Notices & Circulars →'}
             </Link>
           </div>
         </div>

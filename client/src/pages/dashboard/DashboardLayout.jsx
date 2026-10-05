@@ -1,15 +1,29 @@
 import React from 'react';
-import { Navigate, Link } from 'react-router-dom';
+import { Navigate, Routes, Route, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import AdminDashboard from './AdminDashboard';
-import { LogOut, User, LayoutDashboard, Shield, Award } from 'lucide-react';
+import TeacherDashboard from './TeacherDashboard';
+import StudentDashboard from './StudentDashboard';
+import { LogOut, Shield } from 'lucide-react';
+
+const getRoleType = (role) => {
+  if (!role) return 'student';
+  const r = role.toLowerCase();
+  if (['super_admin', 'section_admin', 'admin'].includes(r)) return 'admin';
+  if (r === 'teacher') return 'teacher';
+  if (['student_parent', 'student'].includes(r)) return 'student';
+  return 'student';
+};
 
 export default function DashboardLayout() {
   const { isAuthenticated, user, logout } = useAuth();
+  const location = useLocation();
 
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
   }
+
+  const roleType = getRoleType(user?.role);
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100">
@@ -28,7 +42,7 @@ export default function DashboardLayout() {
             <span className="text-slate-600">|</span>
             <div className="flex items-center gap-2 text-xs text-amber-400 font-semibold bg-slate-800 px-3 py-1 rounded-full border border-slate-700">
               <Shield className="w-3.5 h-3.5" />
-              <span className="capitalize">{user?.role?.replace('_', ' ')}</span>
+              <span className="capitalize">{roleType} Dashboard ({user?.role?.replace('_', ' ')})</span>
             </div>
           </div>
 
@@ -52,11 +66,45 @@ export default function DashboardLayout() {
         </div>
       </header>
 
-      {/* Main Dashboard Workspace */}
+      {/* Main Dashboard Workspace based on role */}
       <main className="max-w-7xl mx-auto px-4 py-8">
-        <AdminDashboard user={user} />
+        <Routes>
+          <Route path="/" element={<Navigate to={`/dashboard/${roleType}`} replace />} />
+          <Route
+            path="admin"
+            element={
+              roleType === 'admin' ? (
+                <AdminDashboard user={user} />
+              ) : (
+                <Navigate to={`/dashboard/${roleType}`} replace />
+              )
+            }
+          />
+          <Route
+            path="teacher"
+            element={
+              roleType === 'teacher' ? (
+                <TeacherDashboard user={user} />
+              ) : (
+                <Navigate to={`/dashboard/${roleType}`} replace />
+              )
+            }
+          />
+          <Route
+            path="student"
+            element={
+              roleType === 'student' ? (
+                <StudentDashboard user={user} />
+              ) : (
+                <Navigate to={`/dashboard/${roleType}`} replace />
+              )
+            }
+          />
+          <Route path="*" element={<Navigate to={`/dashboard/${roleType}`} replace />} />
+        </Routes>
       </main>
 
     </div>
   );
 }
+

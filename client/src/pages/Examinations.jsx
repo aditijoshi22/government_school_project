@@ -58,12 +58,12 @@ export default function Examinations() {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
             <div className="p-4 bg-amber-50 dark:bg-amber-950/40 rounded-2xl border border-amber-200 dark:border-amber-900 space-y-2">
-              <strong className="text-amber-900 dark:text-amber-200 font-bold block">Pre-Primary (Class 1-4)</strong>
+              <strong className="text-amber-900 dark:text-amber-200 font-bold block">Primary (Class 1-4)</strong>
               <p className="text-slate-600 dark:text-slate-300">No traditional marks or pass/fail stress. Evaluated continuously via descriptive grades (A/B/C) across reading, numeracy, sports, and social habits.</p>
             </div>
 
             <div className="p-4 bg-emerald-50 dark:bg-emerald-950/40 rounded-2xl border border-emerald-200 dark:border-emerald-900 space-y-2">
-              <strong className="text-emerald-900 dark:text-emerald-200 font-bold block">Primary (Class 5-10)</strong>
+              <strong className="text-emerald-900 dark:text-emerald-200 font-bold block">Secondary (Class 5-10)</strong>
               <p className="text-slate-600 dark:text-slate-300">Unit Tests (20 marks), Semester Exams (80 marks), oral & practical tests. Includes Class 5 & 8 Scholarship exam mock tests.</p>
             </div>
 

@@ -109,6 +109,10 @@ export function initDatabase() {
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       title TEXT NOT NULL,
       content TEXT NOT NULL,
+      title_en TEXT,
+      title_mr TEXT,
+      content_en TEXT,
+      content_mr TEXT,
       category TEXT DEFAULT 'general',
       attachment_url TEXT,
       section_id TEXT,
@@ -141,6 +145,8 @@ export function initDatabase() {
     CREATE TABLE IF NOT EXISTS exams (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       title TEXT NOT NULL,
+      title_en TEXT,
+      title_mr TEXT,
       exam_type TEXT NOT NULL,
       section_id TEXT NOT NULL,
       class_number INTEGER NOT NULL,
@@ -195,6 +201,10 @@ export function initDatabase() {
       subject_name TEXT NOT NULL,
       title TEXT NOT NULL,
       description TEXT NOT NULL,
+      title_en TEXT,
+      title_mr TEXT,
+      description_en TEXT,
+      description_mr TEXT,
       due_date TEXT NOT NULL,
       attachment_url TEXT,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP
@@ -222,6 +232,10 @@ export function initDatabase() {
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       title TEXT NOT NULL,
       description TEXT,
+      title_en TEXT,
+      title_mr TEXT,
+      description_en TEXT,
+      description_mr TEXT,
       cover_image TEXT NOT NULL,
       section_id TEXT,
       date TEXT NOT NULL
@@ -239,6 +253,10 @@ export function initDatabase() {
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       title TEXT NOT NULL,
       description TEXT NOT NULL,
+      title_en TEXT,
+      title_mr TEXT,
+      description_en TEXT,
+      description_mr TEXT,
       event_date TEXT NOT NULL,
       venue TEXT NOT NULL,
       section_id TEXT,
@@ -259,6 +277,11 @@ export function initDatabase() {
     CREATE TABLE IF NOT EXISTS downloads (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       title TEXT NOT NULL,
+      description TEXT,
+      title_en TEXT,
+      title_mr TEXT,
+      description_en TEXT,
+      description_mr TEXT,
       category TEXT NOT NULL,
       section_id TEXT,
       file_url TEXT NOT NULL,
@@ -266,6 +289,39 @@ export function initDatabase() {
       updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
     );
   `);
+
+  // Safe ALTER TABLE migrations for existing tables
+  const alterQueries = [
+    `ALTER TABLE notices ADD COLUMN title_en TEXT`,
+    `ALTER TABLE notices ADD COLUMN title_mr TEXT`,
+    `ALTER TABLE notices ADD COLUMN content_en TEXT`,
+    `ALTER TABLE notices ADD COLUMN content_mr TEXT`,
+    `ALTER TABLE events ADD COLUMN title_en TEXT`,
+    `ALTER TABLE events ADD COLUMN title_mr TEXT`,
+    `ALTER TABLE events ADD COLUMN description_en TEXT`,
+    `ALTER TABLE events ADD COLUMN description_mr TEXT`,
+    `ALTER TABLE gallery_albums ADD COLUMN title_en TEXT`,
+    `ALTER TABLE gallery_albums ADD COLUMN title_mr TEXT`,
+    `ALTER TABLE gallery_albums ADD COLUMN description_en TEXT`,
+    `ALTER TABLE gallery_albums ADD COLUMN description_mr TEXT`,
+    `ALTER TABLE homework ADD COLUMN title_en TEXT`,
+    `ALTER TABLE homework ADD COLUMN title_mr TEXT`,
+    `ALTER TABLE homework ADD COLUMN description_en TEXT`,
+    `ALTER TABLE homework ADD COLUMN description_mr TEXT`,
+    `ALTER TABLE downloads ADD COLUMN description TEXT`,
+    `ALTER TABLE downloads ADD COLUMN title_en TEXT`,
+    `ALTER TABLE downloads ADD COLUMN title_mr TEXT`,
+    `ALTER TABLE downloads ADD COLUMN description_en TEXT`,
+    `ALTER TABLE downloads ADD COLUMN description_mr TEXT`
+  ];
+
+  alterQueries.forEach(q => {
+    try {
+      db.exec(q);
+    } catch (e) {
+      // Column already exists or table freshly created
+    }
+  });
 }
 
 export default db;

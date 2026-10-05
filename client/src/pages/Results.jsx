@@ -170,7 +170,7 @@ export default function Results() {
                 </p>
                 <div className="pt-2">
                   <span className="inline-block bg-slate-900 text-amber-400 font-bold text-xs px-4 py-1 rounded-full uppercase">
-                    {resultData.type === 'grade-based' ? 'PRE-PRIMARY PROGRESS REPORT CARD' : 'OFFICIAL STATEMENT OF MARKS'}
+                    {resultData.type === 'grade-based' ? 'PRIMARY PROGRESS REPORT CARD' : 'OFFICIAL STATEMENT OF MARKS'}
                   </span>
                 </div>
               </div>
@@ -183,7 +183,7 @@ export default function Results() {
                 <div><span className="text-slate-500">Roll Number:</span> <strong className="block text-sm">{resultData.student.roll_number}</strong></div>
               </div>
 
-              {/* Grade-based Progress Report (Pre-Primary) */}
+              {/* Grade-based Progress Report (Primary) */}
               {resultData.type === 'grade-based' && (
                 <div className="space-y-4">
                   <div className="overflow-x-auto">

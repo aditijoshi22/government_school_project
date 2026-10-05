@@ -24,7 +24,7 @@ export default function About() {
               Established in {schoolConfig.establishedYear}, {schoolConfig.name} is a premier government institution managed under the Zilla Parishad educational council of Amravati District.
             </p>
             <p>
-              Over six decades, the institution has expanded from a modest primary facility into a full-fledged educational hub comprising <strong>Pre-Primary (Class 1-4)</strong>, <strong>Primary & Secondary (Class 5-10)</strong>, and <strong>Higher Secondary Junior College (Class 11-12)</strong> across Science, Commerce, and Arts streams.
+              Over six decades, the institution has expanded from a modest primary facility into a full-fledged educational hub comprising <strong>Primary (Class 1-4)</strong>, <strong>Secondary (Class 5-10)</strong>, and <strong>Higher Secondary Junior College (Class 11-12)</strong> across Science, Commerce, and Arts streams.
             </p>
             <div className="grid grid-cols-2 gap-4 pt-2">
               <div className="bg-slate-100 dark:bg-slate-800 p-4 rounded-2xl">
@@ -112,7 +112,7 @@ export default function About() {
                 <tr>
                   <td className="p-3 font-semibold text-blue-600">Teacher Representative</td>
                   <td className="p-3 font-bold">Shri. Gajanan V. Kulkarni</td>
-                  <td className="p-3">Primary Section Head (M.Sc., B.Ed.)</td>
+                  <td className="p-3">Secondary Section Head (M.Sc., B.Ed.)</td>
                 </tr>
               </tbody>
             </table>
