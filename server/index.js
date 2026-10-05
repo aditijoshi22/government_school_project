@@ -208,7 +208,7 @@ app.post('/api/public/results/lookup', (req, res) => {
     const section = getSectionById(section_id);
 
     if (section.assessmentType === 'grade-based') {
-      // Pre-Primary Progress Report
+      // Primary Progress Report
       const report = db.prepare(`SELECT * FROM progress_reports WHERE student_id = ?`).get(student.id);
       return res.json({
         success: true,
@@ -365,8 +365,8 @@ app.get('/api/auth/me', authenticateToken, (req, res) => {
 // 4. ADMIN DASHBOARD & MANAGEMENT ROUTES
 // -------------------------------------------------------------
 
-// Dashboard Stats per Section
-app.get('/api/admin/dashboard/stats', authenticateToken, (req, res) => {
+// Dashboard Stats per Section (Admin & Teacher)
+app.get('/api/admin/dashboard/stats', authenticateToken, authorizeRoles('admin', 'teacher'), (req, res) => {
   try {
     const { section_id } = req.query;
     
@@ -422,8 +422,8 @@ app.get('/api/admin/dashboard/stats', authenticateToken, (req, res) => {
   }
 });
 
-// Student Management CRUD
-app.get('/api/admin/students', authenticateToken, (req, res) => {
+// Student Management (Admin & Teacher View; Admin Edit/Add/Delete)
+app.get('/api/admin/students', authenticateToken, authorizeRoles('admin', 'teacher'), (req, res) => {
   try {
     const { section_id, class_number } = req.query;
     let query = `SELECT * FROM students WHERE 1=1`;
@@ -446,7 +446,7 @@ app.get('/api/admin/students', authenticateToken, (req, res) => {
   }
 });
 
-app.post('/api/admin/students', authenticateToken, authorizeRoles('super_admin', 'section_admin'), (req, res) => {
+app.post('/api/admin/students', authenticateToken, authorizeRoles('admin'), (req, res) => {
   try {
     const {
       gr_number, roll_number, first_name, last_name, gender, dob,
@@ -468,8 +468,32 @@ app.post('/api/admin/students', authenticateToken, authorizeRoles('super_admin',
   }
 });
 
-// Admission Applications Management
-app.get('/api/admin/admissions', authenticateToken, (req, res) => {
+app.put('/api/admin/students/:id', authenticateToken, authorizeRoles('admin'), (req, res) => {
+  try {
+    const { id } = req.params;
+    const { first_name, last_name, phone, address, class_number, division_name } = req.body;
+    db.prepare(`
+      UPDATE students SET first_name = ?, last_name = ?, phone = ?, address = ?, class_number = ?, division_name = ?
+      WHERE id = ?
+    `).run(first_name, last_name, phone, address, class_number, division_name, id);
+    res.json({ success: true, message: 'Student details updated successfully' });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
+app.delete('/api/admin/students/:id', authenticateToken, authorizeRoles('admin'), (req, res) => {
+  try {
+    const { id } = req.params;
+    db.prepare(`DELETE FROM students WHERE id = ?`).run(id);
+    res.json({ success: true, message: 'Student record deleted' });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
+// Admission Applications Management (Admin ONLY)
+app.get('/api/admin/admissions', authenticateToken, authorizeRoles('admin'), (req, res) => {
   try {
     const { section_id, status } = req.query;
     let query = `SELECT * FROM admissions WHERE 1=1`;
@@ -492,7 +516,7 @@ app.get('/api/admin/admissions', authenticateToken, (req, res) => {
   }
 });
 
-app.put('/api/admin/admissions/:id/status', authenticateToken, authorizeRoles('super_admin', 'section_admin'), (req, res) => {
+app.put('/api/admin/admissions/:id/status', authenticateToken, authorizeRoles('admin'), (req, res) => {
   try {
     const { id } = req.params;
     const { status } = req.body;
@@ -508,23 +532,82 @@ app.put('/api/admin/admissions/:id/status', authenticateToken, authorizeRoles('s
   }
 });
 
-// Notice Management (Publish notice)
-app.post('/api/admin/notices', authenticateToken, authorizeRoles('super_admin', 'section_admin', 'teacher'), upload.single('attachment'), (req, res) => {
+// Full Notice Management CRUD
+app.get('/api/admin/notices', authenticateToken, authorizeRoles('admin', 'teacher'), (req, res) => {
   try {
-    const { title, content, category, section_id, class_number, is_important } = req.body;
+    const notices = db.prepare(`SELECT * FROM notices ORDER BY created_at DESC`).all();
+    res.json({ success: true, data: notices });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
+app.post('/api/admin/notices', authenticateToken, authorizeRoles('admin', 'teacher'), upload.single('attachment'), (req, res) => {
+  try {
+    const { title, content, title_en, title_mr, content_en, content_mr, category, section_id, class_number, is_important } = req.body;
     const attachment_url = req.file ? `/uploads/${req.file.filename}` : null;
 
-    db.prepare(`
-      INSERT INTO notices (title, content, category, attachment_url, section_id, class_number, is_important)
-      VALUES (?, ?, ?, ?, ?, ?, ?)
+    const finalTitleEn = title_en || title || '';
+    const finalTitleMr = title_mr || title || finalTitleEn;
+    const finalContentEn = content_en || content || '';
+    const finalContentMr = content_mr || content || finalContentEn;
+
+    const result = db.prepare(`
+      INSERT INTO notices (title, content, title_en, title_mr, content_en, content_mr, category, attachment_url, section_id, class_number, is_important)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `).run(
-      title, content, category || 'general', attachment_url,
-      section_id === 'all' ? null : section_id,
+      finalTitleEn, finalContentEn, finalTitleEn, finalTitleMr, finalContentEn, finalContentMr,
+      category || 'general', attachment_url,
+      !section_id || section_id === 'all' ? null : section_id,
       class_number ? parseInt(class_number, 10) : null,
-      is_important ? 1 : 0
+      is_important === 'true' || is_important === true || is_important === 1 ? 1 : 0
     );
 
-    res.json({ success: true, message: 'Notice published successfully' });
+    res.json({ success: true, message: 'Notice published successfully', id: result.lastInsertRowid });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
+app.put('/api/admin/notices/:id', authenticateToken, authorizeRoles('admin'), upload.single('attachment'), (req, res) => {
+  try {
+    const { id } = req.params;
+    const { title_en, title_mr, content_en, content_mr, category, section_id, is_important } = req.body;
+    const existing = db.prepare(`SELECT * FROM notices WHERE id = ?`).get(id);
+
+    if (!existing) {
+      return res.status(404).json({ success: false, message: 'Notice not found' });
+    }
+
+    const attachment_url = req.file ? `/uploads/${req.file.filename}` : existing.attachment_url;
+    const finalTitleEn = title_en || existing.title_en;
+    const finalTitleMr = title_mr || existing.title_mr;
+    const finalContentEn = content_en || existing.content_en;
+    const finalContentMr = content_mr || existing.content_mr;
+
+    db.prepare(`
+      UPDATE notices 
+      SET title = ?, content = ?, title_en = ?, title_mr = ?, content_en = ?, content_mr = ?, category = ?, attachment_url = ?, section_id = ?, is_important = ?
+      WHERE id = ?
+    `).run(
+      finalTitleEn, finalContentEn, finalTitleEn, finalTitleMr, finalContentEn, finalContentMr,
+      category || existing.category, attachment_url,
+      !section_id || section_id === 'all' ? null : section_id,
+      is_important === 'true' || is_important === true || is_important === 1 ? 1 : 0,
+      id
+    );
+
+    res.json({ success: true, message: 'Notice updated successfully' });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
+app.delete('/api/admin/notices/:id', authenticateToken, authorizeRoles('admin'), (req, res) => {
+  try {
+    const { id } = req.params;
+    db.prepare(`DELETE FROM notices WHERE id = ?`).run(id);
+    res.json({ success: true, message: 'Notice deleted successfully' });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
@@ -535,9 +618,26 @@ app.post('/api/admin/notices', authenticateToken, authorizeRoles('super_admin', 
 // -------------------------------------------------------------
 
 // Post or update Marks (Primary & High School)
-app.post('/api/academics/marks', authenticateToken, authorizeRoles('super_admin', 'section_admin', 'teacher'), (req, res) => {
+app.post('/api/academics/marks', authenticateToken, authorizeRoles('admin', 'teacher'), (req, res) => {
   try {
     const { student_id, exam_id, subject_id, subject_name, marks_obtained, max_marks, remarks } = req.body;
+
+    // Verify student exists
+    const student = db.prepare(`SELECT * FROM students WHERE id = ?`).get(student_id);
+    if (!student) {
+      return res.status(404).json({ success: false, message: 'Student record not found' });
+    }
+
+    // If request is from a teacher, enforce assigned section check
+    if (req.user.role === 'teacher') {
+      const teacher = db.prepare(`SELECT * FROM teachers WHERE user_id = ?`).get(req.user.id);
+      if (teacher && teacher.section_id && teacher.section_id !== student.section_id) {
+        return res.status(403).json({
+          success: false,
+          message: 'Access denied: You are not authorized to enter marks for students outside your assigned section.'
+        });
+      }
+    }
 
     const maxM = max_marks || 100;
     const pct = (marks_obtained / maxM) * 100;
@@ -560,13 +660,28 @@ app.post('/api/academics/marks', authenticateToken, authorizeRoles('super_admin'
   }
 });
 
-// Post or update Progress Report (Pre-Primary)
-app.post('/api/academics/progress-reports', authenticateToken, authorizeRoles('super_admin', 'section_admin', 'teacher'), (req, res) => {
+// Post or update Progress Report (Primary)
+app.post('/api/academics/progress-reports', authenticateToken, authorizeRoles('admin', 'teacher'), (req, res) => {
   try {
     const {
       student_id, academic_year, term, reading_grade, writing_grade,
       numeracy_grade, art_grade, sports_grade, discipline_grade, overall_grade, teacher_remarks
     } = req.body;
+
+    const student = db.prepare(`SELECT * FROM students WHERE id = ?`).get(student_id);
+    if (!student) {
+      return res.status(404).json({ success: false, message: 'Student record not found' });
+    }
+
+    if (req.user.role === 'teacher') {
+      const teacher = db.prepare(`SELECT * FROM teachers WHERE user_id = ?`).get(req.user.id);
+      if (teacher && teacher.section_id && teacher.section_id !== student.section_id) {
+        return res.status(403).json({
+          success: false,
+          message: 'Access denied: You are not authorized to enter report cards outside your assigned section.'
+        });
+      }
+    }
 
     db.prepare(`
       INSERT INTO progress_reports (student_id, academic_year, term, reading_grade, writing_grade, numeracy_grade, art_grade, sports_grade, discipline_grade, overall_grade, teacher_remarks)
@@ -576,7 +691,101 @@ app.post('/api/academics/progress-reports', authenticateToken, authorizeRoles('s
       reading_grade, writing_grade, numeracy_grade, art_grade, sports_grade, discipline_grade, overall_grade, teacher_remarks
     );
 
-    res.json({ success: true, message: 'Pre-Primary Progress Report saved successfully' });
+    res.json({ success: true, message: 'Progress Report saved successfully' });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
+// -------------------------------------------------------------
+// 6. TEACHER DASHBOARD API
+// -------------------------------------------------------------
+app.get('/api/teacher/dashboard', authenticateToken, authorizeRoles('teacher'), (req, res) => {
+  try {
+    const teacher = db.prepare(`SELECT * FROM teachers WHERE user_id = ?`).get(req.user.id);
+    if (!teacher) {
+      return res.status(404).json({ success: false, message: 'Teacher profile not found' });
+    }
+
+    const assignments = db.prepare(`SELECT * FROM teacher_assignments WHERE teacher_id = ?`).all(teacher.id);
+    
+    // Assigned students in teacher's section
+    const students = db.prepare(`
+      SELECT * FROM students WHERE section_id = ? ORDER BY class_number ASC, roll_number ASC
+    `).all(teacher.section_id);
+
+    // Relevant notices
+    const notices = db.prepare(`
+      SELECT * FROM notices WHERE section_id = ? OR section_id IS NULL ORDER BY created_at DESC
+    `).all(teacher.section_id);
+
+    // Timetable
+    const timetable = db.prepare(`
+      SELECT * FROM timetable WHERE teacher_name LIKE ? OR section_id = ?
+    `).all(`%${teacher.full_name}%`, teacher.section_id);
+
+    res.json({
+      success: true,
+      data: {
+        teacher,
+        assignments,
+        students,
+        notices,
+        timetable
+      }
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
+// -------------------------------------------------------------
+// 7. STUDENT DASHBOARD API
+// -------------------------------------------------------------
+app.get('/api/student/dashboard', authenticateToken, authorizeRoles('student'), (req, res) => {
+  try {
+    const student = db.prepare(`SELECT * FROM students WHERE user_id = ?`).get(req.user.id);
+    if (!student) {
+      return res.status(404).json({ success: false, message: 'Student profile not found' });
+    }
+
+    const section = getSectionById(student.section_id);
+    const marks = db.prepare(`SELECT * FROM results WHERE student_id = ?`).all(student.id);
+    const progressReport = db.prepare(`SELECT * FROM progress_reports WHERE student_id = ?`).get(student.id);
+    const attendance = db.prepare(`SELECT * FROM attendance WHERE student_id = ? ORDER BY date DESC`).all(student.id);
+    const timetable = db.prepare(`
+      SELECT * FROM timetable WHERE section_id = ? AND class_number = ?
+    `).all(student.section_id, student.class_number);
+    const homework = db.prepare(`
+      SELECT * FROM homework WHERE section_id = ? AND class_number = ? ORDER BY due_date ASC
+    `).all(student.section_id, student.class_number);
+    const notices = db.prepare(`
+      SELECT * FROM notices WHERE section_id = ? OR section_id IS NULL ORDER BY is_important DESC, created_at DESC
+    `).all(student.section_id);
+    const downloads = db.prepare(`
+      SELECT * FROM downloads WHERE section_id = ? OR section_id IS NULL ORDER BY updated_at DESC
+    `).all(student.section_id);
+
+    // Calculate attendance percentage
+    const totalDays = attendance.length;
+    const presentDays = attendance.filter(a => a.status === 'present' || a.status === 'late').length;
+    const attendancePercentage = totalDays > 0 ? ((presentDays / totalDays) * 100).toFixed(1) : 100;
+
+    res.json({
+      success: true,
+      data: {
+        student,
+        section,
+        marks,
+        progressReport,
+        attendance,
+        attendancePercentage,
+        timetable,
+        homework,
+        notices,
+        downloads
+      }
+    });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }

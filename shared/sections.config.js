@@ -2,18 +2,18 @@
  * School Academic Sections Configuration - Single Source of Truth
  * Used across Frontend navigation, Backend controllers, and Database seeders.
  * 
- * Section 1: Pre-Primary (Class 1-4)
- * Section 2: Primary (Class 5-10)
+ * Section 1: Primary (Class 1-4)
+ * Section 2: Secondary (Class 5-10)
  * Section 3: High School (Class 11-12)
  */
 
 const SECTIONS_CONFIG = [
   {
-    id: "pre-primary",
-    nameEn: "Pre-Primary Section",
-    nameMr: "पूर्व-प्राथमिक विभाग",
-    nameHi: "पूर्व-प्राथमिक विभाग",
-    shortName: "Pre-Primary",
+    id: "primary",
+    nameEn: "Primary Section",
+    nameMr: "प्राथमिक विभाग",
+    nameHi: "प्राथमिक विभाग",
+    shortName: "Primary (1-4)",
     classes: [1, 2, 3, 4],
     classList: ["Class 1", "Class 2", "Class 3", "Class 4"],
     sectionHead: "Smt. Sunita R. Patil",
@@ -52,11 +52,11 @@ const SECTIONS_CONFIG = [
     ]
   },
   {
-    id: "primary",
-    nameEn: "Primary & Secondary Section",
-    nameMr: "प्राथमिक व माध्यमिक विभाग",
-    nameHi: "प्राथमिक एवं माध्यमिक विभाग",
-    shortName: "Primary (5-10)",
+    id: "secondary",
+    nameEn: "Secondary Section",
+    nameMr: "माध्यमिक विभाग",
+    nameHi: "माध्यमिक विभाग",
+    shortName: "Secondary (5-10)",
     classes: [5, 6, 7, 8, 9, 10],
     classList: ["Class 5", "Class 6", "Class 7", "Class 8", "Class 9", "Class 10"],
     scholarshipClasses: [5, 8],
