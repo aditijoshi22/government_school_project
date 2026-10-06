@@ -43,17 +43,32 @@ export default function Home() {
           <div className="lg:col-span-8 space-y-6">
             <span className="inline-flex items-center gap-2 bg-amber-400 text-slate-950 font-extrabold text-xs px-3.5 py-1.5 rounded-full uppercase tracking-wider shadow">
               <Sparkles className="w-3.5 h-3.5" />
-              Goverment Accredited • UDISE: {schoolConfig.udiseCode}
+              Primary • Secondary • Junior College
             </span>
             <h1 className="text-3xl md:text-5xl font-extrabold tracking-tight leading-tight">
-              {schoolConfig.name}
+              {schoolConfig.projectShortName}
             </h1>
-            <p className="text-amber-300 font-devanagari text-lg md:text-xl font-medium">
-              {schoolConfig.nameMarathi}
+            <p className="text-amber-300 text-lg md:text-xl font-medium">
+              {schoolConfig.projectTagline}
             </p>
             <p className="text-slate-300 text-base md:text-lg max-w-2xl leading-relaxed">
-              Empowering students from Pre-Primary to Higher Secondary (Science, Commerce & Arts) with academic excellence, competitive scholarship coaching, and modern values.
+              One portal for our three schools. Choose a school below to see its classes, curriculum, faculty head and more.
             </p>
+            <div className="flex flex-col gap-2 max-w-2xl">
+              {SECTIONS_CONFIG.map((sec) => (
+                <Link
+                  key={sec.id}
+                  to={`/sections/${sec.id}`}
+                  className="flex items-center justify-between gap-3 bg-white/10 hover:bg-white/20 border border-white/20 rounded-xl px-4 py-2.5 text-sm font-semibold transition"
+                >
+                  <span className="flex items-center gap-2">
+                    <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: sec.themeColor }}></span>
+                    {sec.schoolName}
+                  </span>
+                  <ChevronRight className="w-4 h-4 text-amber-300 shrink-0" />
+                </Link>
+              ))}
+            </div>
             <div className="flex flex-wrap gap-4 pt-2">
               <Link
                 to="/admissions"
@@ -105,13 +120,13 @@ export default function Home() {
       <section className="max-w-7xl mx-auto px-4">
         <div className="text-center max-w-2xl mx-auto mb-10 space-y-2">
           <span className="text-xs font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400 bg-amber-100 dark:bg-amber-950/60 px-3 py-1 rounded-full">
-            Core Academic Structure
+            Our Schools
           </span>
           <h2 className="text-2xl md:text-3xl font-extrabold text-slate-900 dark:text-white">
-            Three Distinct Academic Sections
+            Our Three Schools
           </h2>
           <p className="text-slate-600 dark:text-slate-400 text-sm">
-            Each section is tailored with its own dedicated curriculum, assessment mode, faculty head, and section theme.
+            Click on a school to view its complete information.
           </p>
         </div>
 
@@ -132,11 +147,11 @@ export default function Home() {
                   </span>
                 </div>
 
-                <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-1 group-hover:text-blue-600 transition" style={{ color: sec.themeColor }}>
-                  {sec.nameEn}
+                <h3 className="text-xl font-bold mb-1 transition" style={{ color: sec.themeColor }}>
+                  <Link to={`/sections/${sec.id}`} className="hover:underline">{sec.schoolName}</Link>
                 </h3>
-                <p className="text-xs font-devanagari font-medium text-slate-500 dark:text-slate-400 mb-3">
-                  {sec.nameMr}
+                <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 mb-3">
+                  {sec.schoolLevel}
                 </p>
                 <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed mb-4">
                   {sec.description}
@@ -162,7 +177,7 @@ export default function Home() {
                   to={`/sections/${sec.id}`}
                   className={`w-full py-3 px-4 rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition ${sec.themeButton}`}
                 >
-                  <span>Explore {sec.shortName} Section</span>
+                  <span>View School Info</span>
                   <ChevronRight className="w-4 h-4" />
                 </Link>
               </div>

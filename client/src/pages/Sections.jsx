@@ -24,11 +24,10 @@ export default function Sections() {
   return (
     <div className="space-y-12 pb-16">
       <PageHeader
-        title={section.nameEn}
-        titleMr={section.nameMr}
+        title={section.schoolName}
         subtitle={section.description}
         themeColor={section.themeColor}
-        badgeText={`Section Head: ${section.sectionHead}`}
+        badgeText={`${section.schoolLevel} • ${section.classList[0]} to ${section.classList[section.classList.length - 1]}`}
       />
 
       <div className="max-w-7xl mx-auto px-4 space-y-10">
@@ -50,9 +49,29 @@ export default function Sections() {
               }}
             >
               {getSectionIcon(sec.iconName)}
-              <span>{sec.shortName}</span>
+              <span>{sec.schoolShortName}</span>
             </Link>
           ))}
+        </div>
+
+        {/* School Info Summary */}
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-sm" style={{ borderTop: `4px solid ${section.themeColor}` }}>
+          <div className="text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1">School Information</div>
+          <h2 className="text-xl md:text-2xl font-extrabold text-slate-900 dark:text-white" style={{ color: section.themeColor }}>{section.schoolName}</h2>
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mt-4 text-xs">
+            <div className="bg-slate-50 dark:bg-slate-800 p-3 rounded-2xl"><div className="text-slate-500">UDISE Code</div><div className="font-bold font-mono text-slate-900 dark:text-white">{section.udiseCode}</div></div>
+            <div className="bg-slate-50 dark:bg-slate-800 p-3 rounded-2xl"><div className="text-slate-500">Level</div><div className="font-bold text-slate-900 dark:text-white">{section.schoolLevel}</div></div>
+            <div className="bg-slate-50 dark:bg-slate-800 p-3 rounded-2xl"><div className="text-slate-500">Classes</div><div className="font-bold text-slate-900 dark:text-white">{section.classList[0]} to {section.classList[section.classList.length - 1]}</div></div>
+            <div className="bg-slate-50 dark:bg-slate-800 p-3 rounded-2xl"><div className="text-slate-500">{section.sectionHeadRole}</div><div className="font-bold text-slate-900 dark:text-white">{section.sectionHead}</div></div>
+            <div className="bg-slate-50 dark:bg-slate-800 p-3 rounded-2xl"><div className="text-slate-500">Assessment</div><div className="font-bold text-slate-900 dark:text-white capitalize">{section.assessmentType.replace(/-/g, ' ')}</div></div>
+          </div>
+          <ul className="grid grid-cols-1 md:grid-cols-2 gap-2 mt-4">
+            {section.features.map((f, i) => (
+              <li key={i} className="flex items-start gap-2 text-xs text-slate-700 dark:text-slate-300">
+                <CheckCircle className="w-3.5 h-3.5 text-emerald-500 shrink-0 mt-0.5" /><span>{f}</span>
+              </li>
+            ))}
+          </ul>
         </div>
 
         {/* Section Key Details Grid */}
@@ -169,7 +188,7 @@ export default function Sections() {
                 <p className="text-xs text-amber-600 dark:text-amber-400 font-semibold">{section.sectionHeadRole}</p>
               </div>
               <p className="text-xs text-slate-500">
-                Directly responsible for academic scheduling, teacher allocation, and parent queries for {section.shortName}.
+                Directly responsible for academic scheduling, teacher allocation, and parent queries for {section.schoolName}.
               </p>
             </div>
 
@@ -180,7 +199,7 @@ export default function Sections() {
                 <span>Download Syllabus & Timetable</span>
               </h4>
               <p className="text-xs text-slate-300 leading-relaxed">
-                Get official PDF curriculum handbook and daily timetables for {section.shortName}.
+                Get official PDF curriculum handbook and daily timetables for {section.schoolName}.
               </p>
               <Link
                 to="/downloads"

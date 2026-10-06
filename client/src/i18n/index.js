@@ -8,7 +8,7 @@ const resources = {
       nav: {
         home: "Home",
         about: "About Us",
-        sections: "Academics & Sections",
+        sections: "Our Schools",
         prePrimary: "Pre-Primary (1-4)",
         primary: "Primary & SSC (5-10)",
         highSchool: "High School & HSC (11-12)",
@@ -28,7 +28,7 @@ const resources = {
       },
       hero: {
         welcomeTitle: "Quality Education for Bright Futures",
-        subtitle: "Zilla Parishad High School & Junior College, Anjangaon Surji (UDISE: 27070100105)",
+        subtitle: "Shiksha Sahayak - School Information and Management",
         exploreSections: "Explore Academic Sections",
         applyAdmission: "Apply Online Admission 2026-27"
       },
@@ -53,7 +53,7 @@ const resources = {
       nav: {
         home: "मुख्य पृष्ठ",
         about: "आमच्याबद्दल",
-        sections: "शैक्षणिक विभाग",
+        sections: "आमच्या शाळा",
         prePrimary: "पूर्व-प्राथमिक (इयत्ता १ ते ४)",
         primary: "प्राथमिक व माध्यमिक (इयत्ता ५ ते १०)",
         highSchool: "उच्च माध्यमिक (इयत्ता ११ व १२)",
@@ -73,7 +73,7 @@ const resources = {
       },
       hero: {
         welcomeTitle: "उज्वल भविष्यासाठी गुणवत्तेची शिक्षण परंपरा",
-        subtitle: "जिल्हा परिषद उच्च शाळा व कनिष्ठ महाविद्यालय, अंजनगाव सुर्जी (UDISE: 27070100105)",
+        subtitle: "Shiksha Sahayak - School Information and Management",
         exploreSections: "विभाग पहा",
         applyAdmission: "ऑनलाइन प्रवेश अर्ज २०२६-२७"
       },
@@ -98,7 +98,7 @@ const resources = {
       nav: {
         home: "मुख्य पृष्ठ",
         about: "हमारे बारे में",
-        sections: "शैक्षणिक विभाग",
+        sections: "हमारे विद्यालय",
         prePrimary: "पूर्व-प्राथमिक (कक्षा 1 से 4)",
         primary: "प्राथमिक व माध्यमिक (कक्षा 5 से 10)",
         highSchool: "उच्च माध्यमिक (कक्षा 11 व 12)",
@@ -118,7 +118,7 @@ const resources = {
       },
       hero: {
         welcomeTitle: "उज्ज्वल भविष्य के लिए गुणवत्तापूर्ण शिक्षा",
-        subtitle: "जिला परिषद उच्च विद्यालय एवं कनिष्ठ महाविद्यालय, अंजनगांव सुर्जी (UDISE: 27070100105)",
+        subtitle: "Shiksha Sahayak - School Information and Management",
         exploreSections: "विभाग देखें",
         applyAdmission: "ऑनलाइन प्रवेश आवेदन 2026-27"
       },

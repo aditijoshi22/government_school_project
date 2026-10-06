@@ -15,7 +15,7 @@ export default function Navbar() {
 
   const isMarathi = i18n.language === 'mr';
   const isHindi = i18n.language === 'hi';
-  const displayName = isMarathi ? schoolConfig.nameMarathi : isHindi ? schoolConfig.nameHindi : schoolConfig.name;
+  const displayName = schoolConfig.projectName;
 
   const getSectionIcon = (iconName) => {
     switch (iconName) {
@@ -44,16 +44,16 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
         <Link to="/" className="flex items-center gap-3 group">
           <div className="w-12 h-12 rounded-full bg-slate-900 text-amber-400 border-2 border-amber-400 flex items-center justify-center font-bold text-lg shadow">
-            ZP
+            SS
           </div>
           <div>
             <h1 className="text-lg md:text-xl font-bold text-slate-900 dark:text-white leading-tight group-hover:text-blue-700 dark:group-hover:text-blue-400 transition">
               {displayName}
             </h1>
             <p className="text-xs text-slate-500 dark:text-slate-400 flex items-center gap-2">
-              <span>{schoolConfig.contact.address.split(',')[2]}</span>
+              <span>3 Schools</span>
               <span className="inline-block w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-              <span className="font-medium text-emerald-700 dark:text-emerald-400">{schoolConfig.boardShort}</span>
+              <span className="font-medium text-emerald-700 dark:text-emerald-400">Primary • Secondary • Junior College</span>
             </p>
           </div>
         </Link>
@@ -101,7 +101,7 @@ export default function Navbar() {
               </button>
 
               {sectionsDropdownOpen && (
-                <div className="absolute left-0 top-full w-72 bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100 rounded-b-xl shadow-xl border border-slate-200 dark:border-slate-800 py-2 z-50 animate-fadeIn">
+                <div className="absolute left-0 top-full w-96 bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100 rounded-b-xl shadow-xl border border-slate-200 dark:border-slate-800 py-2 z-50 animate-fadeIn">
                   {SECTIONS_CONFIG.map((sec) => (
                     <Link
                       key={sec.id}
@@ -114,10 +114,10 @@ export default function Navbar() {
                       </div>
                       <div>
                         <div className="font-semibold text-slate-900 dark:text-white text-sm" style={{ color: sec.themeColor }}>
-                          {isMarathi ? sec.nameMr : isHindi ? sec.nameHi : sec.nameEn}
+                          {sec.schoolName}
                         </div>
                         <div className="text-xs text-slate-500 dark:text-slate-400">
-                          {sec.classList.join(', ')}
+                          {sec.schoolLevel} • {sec.classList[0]} to {sec.classList[sec.classList.length - 1]}
                         </div>
                       </div>
                     </Link>
@@ -158,7 +158,7 @@ export default function Navbar() {
       {/* Mobile Drawer Navigation */}
       {mobileMenuOpen && (
         <div className="lg:hidden bg-slate-900 text-white px-4 py-4 space-y-3 border-t border-slate-800">
-          <div className="font-bold text-amber-400 text-xs uppercase tracking-wider px-2">Academic Sections</div>
+          <div className="font-bold text-amber-400 text-xs uppercase tracking-wider px-2">Our Schools</div>
           <div className="grid grid-cols-1 gap-1">
             {SECTIONS_CONFIG.map((sec) => (
               <Link
@@ -168,7 +168,7 @@ export default function Navbar() {
                 className="flex items-center gap-2 px-3 py-2 rounded bg-slate-800 text-sm font-medium hover:bg-slate-700"
               >
                 {getSectionIcon(sec.iconName)}
-                <span>{isMarathi ? sec.nameMr : sec.nameEn}</span>
+                <span>{sec.schoolName}</span>
               </Link>
             ))}
           </div>
