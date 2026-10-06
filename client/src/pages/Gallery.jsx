@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import axios from 'axios';
 import PageHeader from '../components/common/PageHeader';
 import Modal from '../components/common/Modal';
 import { SECTIONS_CONFIG } from '@shared/sections.config';
 import { Image as ImageIcon, Calendar, X } from 'lucide-react';
+import { getLocalizedText } from '../utils/bilingual';
 
 export default function Gallery() {
+  const { i18n } = useTranslation();
   const [albums, setAlbums] = useState([]);
   const [selectedSection, setSelectedSection] = useState('all');
   const [activeAlbum, setActiveAlbum] = useState(null);
@@ -41,7 +44,7 @@ export default function Gallery() {
                 : 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300'
             }`}
           >
-            All Albums
+            {i18n.language === 'mr' ? 'सर्व अल्बम' : 'All Albums'}
           </button>
           {SECTIONS_CONFIG.map(s => (
             <button
@@ -64,50 +67,56 @@ export default function Gallery() {
 
         {/* Albums Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {albums.map(album => (
-            <div
-              key={album.id}
-              onClick={() => setActiveAlbum(album)}
-              className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl overflow-hidden shadow-sm hover:shadow-xl transition cursor-pointer group"
-            >
-              <div className="relative h-48 overflow-hidden">
-                <img
-                  src={album.cover_image}
-                  alt={album.title}
-                  className="w-full h-full object-cover group-hover:scale-105 transition duration-300"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent flex items-end p-4">
-                  <span className="text-xs text-amber-300 font-semibold flex items-center gap-1">
-                    <Calendar className="w-3.5 h-3.5" />
-                    {album.date}
-                  </span>
+          {albums.map(album => {
+            const albumTitle = getLocalizedText(album, 'title', i18n.language);
+            const albumDesc = getLocalizedText(album, 'description', i18n.language);
+            return (
+              <div
+                key={album.id}
+                onClick={() => setActiveAlbum(album)}
+                className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl overflow-hidden shadow-sm hover:shadow-xl transition cursor-pointer group"
+              >
+                <div className="relative h-48 overflow-hidden">
+                  <img
+                    src={album.cover_image}
+                    alt={albumTitle}
+                    className="w-full h-full object-cover group-hover:scale-105 transition duration-300"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent flex items-end p-4">
+                    <span className="text-xs text-amber-300 font-semibold flex items-center gap-1">
+                      <Calendar className="w-3.5 h-3.5" />
+                      {album.date}
+                    </span>
+                  </div>
+                </div>
+                <div className="p-5 space-y-2">
+                  <h3 className="font-bold text-slate-900 dark:text-white text-base group-hover:text-amber-500 transition">
+                    {albumTitle}
+                  </h3>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-2">
+                    {albumDesc}
+                  </p>
+                  <div className="text-xs font-bold text-amber-600 dark:text-amber-400 pt-1 flex items-center gap-1">
+                    <ImageIcon className="w-3.5 h-3.5" />
+                    <span>{i18n.language === 'mr' ? 'फोटो पहा' : 'View Photos'} ({album.images?.length || 1})</span>
+                  </div>
                 </div>
               </div>
-              <div className="p-5 space-y-2">
-                <h3 className="font-bold text-slate-900 dark:text-white text-base group-hover:text-amber-500 transition">
-                  {album.title}
-                </h3>
-                <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-2">
-                  {album.description}
-                </p>
-                <div className="text-xs font-bold text-amber-600 dark:text-amber-400 pt-1 flex items-center gap-1">
-                  <ImageIcon className="w-3.5 h-3.5" />
-                  <span>View Photos ({album.images?.length || 1})</span>
-                </div>
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
 
         {/* Lightbox Modal */}
         <Modal
           isOpen={!!activeAlbum}
           onClose={() => setActiveAlbum(null)}
-          title={activeAlbum?.title || 'Album Photos'}
+          title={getLocalizedText(activeAlbum, 'title', i18n.language) || 'Album Photos'}
           maxWidth="max-w-4xl"
         >
           <div className="space-y-4">
-            <p className="text-xs text-slate-600 dark:text-slate-300">{activeAlbum?.description}</p>
+            <p className="text-xs text-slate-600 dark:text-slate-300">
+              {getLocalizedText(activeAlbum, 'description', i18n.language)}
+            </p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {activeAlbum?.images?.map(img => (
                 <div key={img.id} className="rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800 bg-slate-950">

@@ -7,7 +7,7 @@ import { Sparkles, BookOpen, GraduationCap, Download, Calendar, CheckCircle, Fil
 
 export default function Sections() {
   const { sectionId } = useParams();
-  const activeSectionId = sectionId || 'pre-primary';
+  const activeSectionId = sectionId || 'primary';
   const section = getSectionById(activeSectionId) || SECTIONS_CONFIG[0];
 
   const [academicsData, setAcademicsData] = useState(null);
@@ -138,7 +138,7 @@ export default function Sections() {
               </div>
             )}
 
-            {/* Pre-Primary Descriptive Grade System */}
+            {/* Primary Descriptive Grade System */}
             {section.skills && (
               <div className="bg-amber-50/50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900 rounded-3xl p-6 space-y-4">
                 <h3 className="text-lg font-bold text-amber-900 dark:text-amber-200 flex items-center gap-2">

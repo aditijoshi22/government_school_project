@@ -9,8 +9,9 @@ const resources = {
         home: "Home",
         about: "About Us",
         sections: "Our Schools",
-        prePrimary: "Pre-Primary (1-4)",
-        primary: "Primary & SSC (5-10)",
+        prePrimary: "Primary (1-4)",
+        primary: "Primary (1-4)",
+        secondary: "Secondary & SSC (5-10)",
         highSchool: "High School & HSC (11-12)",
         admissions: "Admissions",
         examinations: "Examinations",
@@ -34,8 +35,8 @@ const resources = {
       },
       sections: {
         title: "Our Academic Sections",
-        prePrimaryDesc: "Class 1 to 4 - Activity-based learning, descriptive grades, and child-centric care.",
-        primaryDesc: "Class 5 to 10 - State curriculum, Class 5 & 8 Scholarship exam prep & Class 10 SSC Board.",
+        primaryDesc: "Class 1 to 4 - Activity-based learning, descriptive grades, and child-centric care.",
+        secondaryDesc: "Class 5 to 10 - State curriculum, Class 5 & 8 Scholarship exam prep & Class 10 SSC Board.",
         highSchoolDesc: "Class 11 & 12 - Science, Commerce & Arts streams, HSC Board & Competitive Entrance Cell."
       },
       resultLookup: {
@@ -45,6 +46,16 @@ const resources = {
         selectSection: "Select Section",
         selectClass: "Select Class",
         searchBtn: "View Marksheet / Progress Report"
+      },
+      roles: {
+        adminDashboard: "Admin Dashboard",
+        teacherDashboard: "Teacher Dashboard",
+        studentDashboard: "Student Dashboard",
+        enterMarks: "Enter Marks",
+        myResults: "My Results",
+        myAttendance: "My Attendance",
+        latestNotices: "Latest Notices",
+        noNoticesAvailable: "No notices available."
       }
     }
   },
@@ -54,8 +65,9 @@ const resources = {
         home: "मुख्य पृष्ठ",
         about: "आमच्याबद्दल",
         sections: "आमच्या शाळा",
-        prePrimary: "पूर्व-प्राथमिक (इयत्ता १ ते ४)",
-        primary: "प्राथमिक व माध्यमिक (इयत्ता ५ ते १०)",
+        prePrimary: "प्राथमिक (इयत्ता १ ते ४)",
+        primary: "प्राथमिक (इयत्ता १ ते ४)",
+        secondary: "माध्यमिक (इयत्ता ५ ते १०)",
         highSchool: "उच्च माध्यमिक (इयत्ता ११ व १२)",
         admissions: "प्रवेश प्रक्रिया",
         examinations: "परीक्षा व वेळापत्रक",
@@ -79,8 +91,8 @@ const resources = {
       },
       sections: {
         title: "आमचे शैक्षणिक विभाग",
-        prePrimaryDesc: "इयत्ता १ ते ४ - आनंददायी शिक्षण, गुण-विरहीत मूल्यमापन व बालस्नेही वातावरण.",
-        primaryDesc: "इयत्ता ५ ते १० - राज्य अभ्यासक्रम, इयत्ता ५ वी व ८ वी शिष्यवृत्ती परीक्षा व १० वी SSC बोर्ड तयारी.",
+        primaryDesc: "इयत्ता १ ते ४ - आनंददायी शिक्षण, गुण-विरहीत मूल्यमापन व बालस्नेही वातावरण.",
+        secondaryDesc: "इयत्ता ५ ते १० - राज्य अभ्यासक्रम, इयत्ता ५ वी व ८ वी शिष्यवृत्ती परीक्षा व १० वी SSC बोर्ड तयारी.",
         highSchoolDesc: "इयत्ता ११ वी व १२ वी - विज्ञान, वाणिज्य व कला शाखा, HSC बोर्ड व स्पर्धा परीक्षा मार्गदर्शन."
       },
       resultLookup: {
@@ -90,6 +102,16 @@ const resources = {
         selectSection: "विभाग निवडा",
         selectClass: "इयत्ता निवडा",
         searchBtn: "निकाल / प्रगती पुस्तक पहा"
+      },
+      roles: {
+        adminDashboard: "प्रशासन डॅशबोर्ड",
+        teacherDashboard: "शिक्षक डॅशबोर्ड",
+        studentDashboard: "विद्यार्थी डॅशबोर्ड",
+        enterMarks: "गुण नोंदी",
+        myResults: "माझे निकाल",
+        myAttendance: "माझी उपस्थिती",
+        latestNotices: "नवीनतम सूचना",
+        noNoticesAvailable: "कोणतीही सूचना उपलब्ध नाही."
       }
     }
   },
@@ -99,8 +121,9 @@ const resources = {
         home: "मुख्य पृष्ठ",
         about: "हमारे बारे में",
         sections: "हमारे विद्यालय",
-        prePrimary: "पूर्व-प्राथमिक (कक्षा 1 से 4)",
-        primary: "प्राथमिक व माध्यमिक (कक्षा 5 से 10)",
+        prePrimary: "प्राथमिक (कक्षा 1 से 4)",
+        primary: "प्राथमिक (कक्षा 1 से 4)",
+        secondary: "माध्यमिक (कक्षा 5 से 10)",
         highSchool: "उच्च माध्यमिक (कक्षा 11 व 12)",
         admissions: "प्रवेश प्रक्रिया",
         examinations: "परीक्षा व समय सारणी",
@@ -124,8 +147,8 @@ const resources = {
       },
       sections: {
         title: "हमारे शैक्षणिक विभाग",
-        prePrimaryDesc: "कक्षा 1 से 4 - गतिविधि आधारित शिक्षा एवं बाल सुलभ वातावरण।",
-        primaryDesc: "कक्षा 5 से 10 - राज्य पाठ्यक्रम, कक्षा 5 एवं 8 छात्रवृत्ति परीक्षा व SSC बोर्ड तैयारी।",
+        primaryDesc: "कक्षा 1 से 4 - गतिविधि आधारित शिक्षा एवं बाल सुलभ वातावरण।",
+        secondaryDesc: "कक्षा 5 से 10 - राज्य पाठ्यक्रम, कक्षा 5 एवं 8 छात्रवृत्ति परीक्षा व SSC बोर्ड तैयारी।",
         highSchoolDesc: "कक्षा 11 एवं 12 - विज्ञान, वाणिज्य व कला संकाय, HSC बोर्ड व प्रतियोगी परीक्षा मार्गदर्शन।"
       },
       resultLookup: {
@@ -135,6 +158,16 @@ const resources = {
         selectSection: "विभाग चुनें",
         selectClass: "कक्षा चुनें",
         searchBtn: "परिणाम देखें"
+      },
+      roles: {
+        adminDashboard: "प्रशासन डैशबोर्ड",
+        teacherDashboard: "शिक्षक डैशबोर्ड",
+        studentDashboard: "छात्र डैशबोर्ड",
+        enterMarks: "अंक प्रविष्टि",
+        myResults: "मेरे परिणाम",
+        myAttendance: "मेरी उपस्थिति",
+        latestNotices: "नवीनतम सूचनाएं",
+        noNoticesAvailable: "कोई सूचना उपलब्ध नहीं है।"
       }
     }
   }

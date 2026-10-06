@@ -30,7 +30,7 @@ export default function Facilities() {
     },
     {
       title: "PM POSHAN Mid-Day Meal Hall",
-      desc: "Clean kitchen and dining area providing hot, hygienic, and nutritious mid-day meals daily to Pre-Primary & Primary students.",
+      desc: "Clean kitchen and dining area providing hot, hygienic, and nutritious mid-day meals daily to Primary and Secondary students.",
       icon: Utensils,
       color: "bg-orange-500/10 text-orange-600 border-orange-200 dark:border-orange-900"
     },

@@ -21,10 +21,21 @@ export function authenticateToken(req, res, next) {
 
 export function authorizeRoles(...roles) {
   return (req, res, next) => {
-    if (!req.user || !roles.includes(req.user.role)) {
+    if (!req.user) {
+      return res.status(401).json({ success: false, message: 'Unauthorized: Authentication required' });
+    }
+    const userRole = req.user.role;
+    const isAllowed = roles.some(r => {
+      const target = r.toLowerCase();
+      if (target === 'admin') return ['super_admin', 'section_admin', 'admin'].includes(userRole);
+      if (target === 'student') return ['student_parent', 'student'].includes(userRole);
+      return target === userRole;
+    });
+
+    if (!isAllowed) {
       return res.status(403).json({
         success: false,
-        message: 'Access denied: Insufficient permissions for this action'
+        message: 'Forbidden: Insufficient permissions for this action'
       });
     }
     next();

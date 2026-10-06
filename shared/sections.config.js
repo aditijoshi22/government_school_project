@@ -9,20 +9,19 @@
  *
  * NOTE: `id`s are used by the backend/database - do not rename them.
  * Each school has its own `udiseCode`.
- * Edit `schoolName` / `schoolShortName` / `schoolLevel` to change what the website shows.
  */
 
 const SECTIONS_CONFIG = [
   {
-    id: "pre-primary",
+    id: "primary",
     udiseCode: "27140407303",
     schoolName: "Adarsh V.J.N.T. Primary Ashram School",
     schoolShortName: "Adarsh Primary Ashram School",
     schoolLevel: "Primary School",
-    nameEn: "Pre-Primary Section",
-    nameMr: "पूर्व-प्राथमिक विभाग",
-    nameHi: "पूर्व-प्राथमिक विभाग",
-    shortName: "Pre-Primary",
+    nameEn: "Primary Section",
+    nameMr: "प्राथमिक विभाग",
+    nameHi: "प्राथमिक विभाग",
+    shortName: "Primary (1-4)",
     classes: [1, 2, 3, 4],
     classList: ["Class 1", "Class 2", "Class 3", "Class 4"],
     sectionHead: "Smt. Sunita R. Patil",
@@ -61,15 +60,15 @@ const SECTIONS_CONFIG = [
     ]
   },
   {
-    id: "primary",
+    id: "secondary",
     udiseCode: "27140407302",
     schoolName: "Shri Shivajirao Moghe V.J.N.T. Secondary Ashram School",
     schoolShortName: "Shivajirao Moghe Secondary Ashram School",
     schoolLevel: "Secondary School",
-    nameEn: "Primary & Secondary Section",
-    nameMr: "प्राथमिक व माध्यमिक विभाग",
-    nameHi: "प्राथमिक एवं माध्यमिक विभाग",
-    shortName: "Primary (5-10)",
+    nameEn: "Secondary Section",
+    nameMr: "माध्यमिक विभाग",
+    nameHi: "माध्यमिक विभाग",
+    shortName: "Secondary (5-10)",
     classes: [5, 6, 7, 8, 9, 10],
     classList: ["Class 5", "Class 6", "Class 7", "Class 8", "Class 9", "Class 10"],
     scholarshipClasses: [5, 8],

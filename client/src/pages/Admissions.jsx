@@ -12,7 +12,7 @@ export default function Admissions() {
     parent_name: '',
     phone: '',
     email: '',
-    section_id: 'pre-primary',
+    section_id: 'primary',
     class_number: '1',
     stream: 'none',
     previous_school: ''
@@ -59,7 +59,7 @@ export default function Admissions() {
           parent_name: '',
           phone: '',
           email: '',
-          section_id: 'pre-primary',
+          section_id: 'primary',
           class_number: '1',
           stream: 'none',
           previous_school: ''
@@ -82,7 +82,7 @@ export default function Admissions() {
       <PageHeader
         title="Online Admissions Portal 2026-27"
         titleMr="ऑनलाइन प्रवेश प्रक्रिया २०२६-२७"
-        subtitle="Apply for Class 1 to 12 across Pre-Primary, Primary, and High School Junior College streams."
+        subtitle="Apply for Class 1 to 12 across Primary, Secondary, and High School Junior College streams."
         badgeText="Admissions Open"
       />
 
@@ -99,10 +99,10 @@ export default function Admissions() {
 
             <div className="space-y-3 text-xs text-slate-600 dark:text-slate-300">
               <div className="p-3 bg-amber-50 dark:bg-amber-950/40 rounded-2xl border border-amber-200 dark:border-amber-900">
-                <strong className="text-amber-800 dark:text-amber-300">Pre-Primary (Class 1-4):</strong> Minimum age 6 years as of 31st December for Class 1. RTE 25% quota reserved for eligible categories.
+                <strong className="text-amber-800 dark:text-amber-300">Primary (Class 1-4):</strong> Minimum age 6 years as of 31st December for Class 1. RTE 25% quota reserved for eligible categories.
               </div>
               <div className="p-3 bg-emerald-50 dark:bg-emerald-950/40 rounded-2xl border border-emerald-200 dark:border-emerald-900">
-                <strong className="text-emerald-800 dark:text-emerald-300">Primary & Secondary (Class 5-10):</strong> Transfer Certificate (TC) from recognized school along with previous year marksheet required.
+                <strong className="text-emerald-800 dark:text-emerald-300">Secondary (Class 5-10):</strong> Transfer Certificate (TC) from recognized school along with previous year marksheet required.
               </div>
               <div className="p-3 bg-blue-50 dark:bg-blue-950/40 rounded-2xl border border-blue-200 dark:border-blue-900">
                 <strong className="text-blue-800 dark:text-blue-300">High School (Class 11-12):</strong> Stream selection based on Class 10 Board exam percentage. Science (Min 60%), Commerce (Min 50%), Arts (Open).

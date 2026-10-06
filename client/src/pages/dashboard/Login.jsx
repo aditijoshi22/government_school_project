@@ -17,7 +17,14 @@ export default function Login() {
     setErrorMsg('');
     const res = await login(username, password);
     if (res.success) {
-      navigate('/dashboard');
+      const role = res.user?.role?.toLowerCase();
+      if (['super_admin', 'section_admin', 'admin'].includes(role)) {
+        navigate('/dashboard/admin');
+      } else if (role === 'teacher') {
+        navigate('/dashboard/teacher');
+      } else {
+        navigate('/dashboard/student');
+      }
     } else {
       setErrorMsg(res.message);
     }
