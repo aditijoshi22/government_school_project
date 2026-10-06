@@ -24,7 +24,7 @@ export default function Examinations() {
               </div>
               <div>
                 <h3 className="text-xl font-bold text-slate-900 dark:text-white">Class 10 SSC Board Examination Cell</h3>
-                <p className="text-xs text-emerald-800 dark:text-emerald-300 font-semibold">MSBSHSE Pune Board Examination Center</p>
+                <p className="text-xs text-emerald-800 dark:text-emerald-300 font-semibold">Board Examination Center</p>
               </div>
             </div>
             <p className="text-xs text-slate-700 dark:text-slate-300 leading-relaxed">

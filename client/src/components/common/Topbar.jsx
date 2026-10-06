@@ -2,6 +2,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '../../context/ThemeContext';
 import schoolConfig from '@shared/school.config';
+import { SECTIONS_CONFIG } from '@shared/sections.config';
 import { Phone, Mail, Globe, Eye, Sun, Moon, Type } from 'lucide-react';
 
 export default function Topbar() {
@@ -18,7 +19,7 @@ export default function Topbar() {
         {/* Contact & UDISE Metadata */}
         <div className="flex flex-wrap items-center gap-4">
           <span className="flex items-center gap-1 font-semibold text-amber-400">
-            UDISE: {schoolConfig.udiseCode}
+            UDISE: {SECTIONS_CONFIG.map(s => s.udiseCode).join(' • ')}
           </span>
           <span className="hidden sm:inline-block text-slate-600">|</span>
           <a href={`tel:${schoolConfig.contact.phone}`} className="flex items-center gap-1 hover:text-amber-300 transition">

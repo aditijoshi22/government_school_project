@@ -2,14 +2,22 @@
  * School Academic Sections Configuration - Single Source of Truth
  * Used across Frontend navigation, Backend controllers, and Database seeders.
  * 
- * Section 1: Primary (Class 1-4)
- * Section 2: Secondary (Class 5-10)
- * Section 3: High School (Class 11-12)
+ * Each section is one of the 3 schools of the institution:
+ *   1. Primary School            (Class 1-4)   -> Adarsh V.J.N.T. Primary Ashram School
+ *   2. Secondary School          (Class 5-10)  -> Shri Shivajirao Moghe V.J.N.T. Secondary Ashram School
+ *   3. High School / Jr. College (Class 11-12) -> Late Mohan Chavan VJNT Art and Science Junior College
+ *
+ * NOTE: `id`s are used by the backend/database - do not rename them.
+ * Each school has its own `udiseCode`.
  */
 
 const SECTIONS_CONFIG = [
   {
     id: "primary",
+    udiseCode: "27140407303",
+    schoolName: "Adarsh V.J.N.T. Primary Ashram School",
+    schoolShortName: "Adarsh Primary Ashram School",
+    schoolLevel: "Primary School",
     nameEn: "Primary Section",
     nameMr: "प्राथमिक विभाग",
     nameHi: "प्राथमिक विभाग",
@@ -53,6 +61,10 @@ const SECTIONS_CONFIG = [
   },
   {
     id: "secondary",
+    udiseCode: "27140407302",
+    schoolName: "Shri Shivajirao Moghe V.J.N.T. Secondary Ashram School",
+    schoolShortName: "Shivajirao Moghe Secondary Ashram School",
+    schoolLevel: "Secondary School",
     nameEn: "Secondary Section",
     nameMr: "माध्यमिक विभाग",
     nameHi: "माध्यमिक विभाग",
@@ -91,6 +103,10 @@ const SECTIONS_CONFIG = [
   },
   {
     id: "high-school",
+    udiseCode: "27140407301",
+    schoolName: "Late Mohan Chavan VJNT Art and Science Junior College",
+    schoolShortName: "Mohan Chavan Junior College",
+    schoolLevel: "Junior College",
     nameEn: "Higher Secondary Section (Junior College)",
     nameMr: "उच्च माध्यमिक विभाग (कनिष्ठ महाविद्यालय)",
     nameHi: "उच्च माध्यमिक विभाग (कनिष्ठ महाविद्यालय)",

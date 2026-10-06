@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import schoolConfig from '@shared/school.config';
 import { SECTIONS_CONFIG } from '@shared/sections.config';
-import { MapPin, Phone, Mail, Award, ExternalLink, ShieldCheck, Heart } from 'lucide-react';
+import { MapPin, Phone, Mail, Award, ExternalLink, Heart } from 'lucide-react';
 
 export default function Footer() {
   return (
@@ -13,27 +13,23 @@ export default function Footer() {
         <div className="space-y-4">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-full bg-amber-500 text-slate-950 flex items-center justify-center font-extrabold text-base shadow">
-              ZP
+              SS
             </div>
             <div>
-              <h3 className="font-bold text-white text-base leading-snug">{schoolConfig.shortName}</h3>
-              <p className="text-xs text-amber-400 font-mono">UDISE: {schoolConfig.udiseCode}</p>
+              <h3 className="font-bold text-white text-base leading-snug">{schoolConfig.projectShortName}</h3>
+              <p className="text-xs text-amber-400">{schoolConfig.projectTagline}</p>
             </div>
           </div>
           <p className="text-xs text-slate-400 leading-relaxed">
-            A government educational institution dedicated to empowering rural & semi-urban students through comprehensive academics, digital skills, and moral values.
+            One portal for school information and management across our three schools - Primary, Secondary and Junior College.
           </p>
-          <div className="inline-flex items-center gap-2 bg-slate-900 border border-slate-800 rounded-lg p-2.5 text-xs text-slate-300">
-            <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
-            <span>Affiliated with <strong>{schoolConfig.boardShort}</strong></span>
-          </div>
         </div>
 
         {/* Column 2: Academic Sections */}
         <div>
           <h4 className="font-bold text-white text-sm uppercase tracking-wider mb-4 border-b border-slate-800 pb-2 flex items-center gap-2">
             <Award className="w-4 h-4 text-amber-400" />
-            Academic Sections
+            Our Schools
           </h4>
           <ul className="space-y-2.5 text-xs">
             {SECTIONS_CONFIG.map(sec => (
@@ -43,7 +39,7 @@ export default function Footer() {
                   className="hover:text-amber-400 transition flex items-center gap-2"
                 >
                   <span className="w-2 h-2 rounded-full" style={{ backgroundColor: sec.themeColor }}></span>
-                  <span className="font-medium">{sec.nameEn} ({sec.classList[0]} - {sec.classList[sec.classList.length - 1]})</span>
+                  <span className="font-medium">{sec.schoolName} <span className="text-slate-500 font-mono">(UDISE: {sec.udiseCode})</span></span>
                 </Link>
               </li>
             ))}
@@ -97,7 +93,7 @@ export default function Footer() {
       {/* Sponsorship Banner & Footer Credits */}
       <div className="max-w-7xl mx-auto px-4 pt-6 border-t border-slate-900 flex flex-col md:flex-row items-center justify-between text-xs text-slate-500 gap-4">
         <div>
-          © {schoolConfig.sponsorship.year} {schoolConfig.name}. All rights reserved.
+          © {schoolConfig.sponsorship.year} {schoolConfig.projectName}. All rights reserved.
         </div>
 
         {/* Sponsored By Footer Highlight */}

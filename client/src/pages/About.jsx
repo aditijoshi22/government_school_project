@@ -9,8 +9,8 @@ export default function About() {
       <PageHeader
         title="About Our Institution"
         titleMr="आमच्या शाळेविषयी माहिती"
-        subtitle="Zilla Parishad High School & Junior College, Anjangaon Surji - Empowering rural youth since 1965."
-        badgeText="UDISE Code: 27070100105"
+        subtitle="Shiksha Sahayak - School Information and Management. Wadgaon, Tq. Digras, Dist. Yavatmal."
+        badgeText="3 Schools • Primary • Secondary • Junior College"
       />
 
       <div className="max-w-7xl mx-auto px-4 space-y-12">
@@ -26,14 +26,10 @@ export default function About() {
             <p>
               Over six decades, the institution has expanded from a modest primary facility into a full-fledged educational hub comprising <strong>Primary (Class 1-4)</strong>, <strong>Secondary (Class 5-10)</strong>, and <strong>Higher Secondary Junior College (Class 11-12)</strong> across Science, Commerce, and Arts streams.
             </p>
-            <div className="grid grid-cols-2 gap-4 pt-2">
+            <div className="grid grid-cols-1 gap-4 pt-2">
               <div className="bg-slate-100 dark:bg-slate-800 p-4 rounded-2xl">
                 <div className="font-bold text-slate-900 dark:text-white text-base">Medium of Instruction</div>
                 <div className="text-xs text-amber-600 dark:text-amber-400 font-semibold">{schoolConfig.medium}</div>
-              </div>
-              <div className="bg-slate-100 dark:bg-slate-800 p-4 rounded-2xl">
-                <div className="font-bold text-slate-900 dark:text-white text-base">Board Affiliation</div>
-                <div className="text-xs text-emerald-600 dark:text-emerald-400 font-semibold">{schoolConfig.boardShort}</div>
               </div>
             </div>
           </div>

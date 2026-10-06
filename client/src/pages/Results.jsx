@@ -163,10 +163,10 @@ export default function Results() {
                   GOVERNMENT OF MAHARASHTRA • ZILLA PARISHAD EDUCATION BOARD
                 </div>
                 <h2 className="text-xl md:text-2xl font-extrabold uppercase">
-                  {schoolConfig.name}
+                  {resultData.section?.schoolName || schoolConfig.name}
                 </h2>
                 <p className="text-xs text-slate-600">
-                  {schoolConfig.contact.address} • UDISE: {schoolConfig.udiseCode}
+                  {schoolConfig.contact.address} • UDISE: {resultData.section?.udiseCode}
                 </p>
                 <div className="pt-2">
                   <span className="inline-block bg-slate-900 text-amber-400 font-bold text-xs px-4 py-1 rounded-full uppercase">
