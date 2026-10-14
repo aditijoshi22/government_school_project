@@ -47,7 +47,19 @@ export default function Navbar() {
       {/* Brand Header */}
       <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
         <Link to="/" className="flex items-center gap-3 group">
-          <div className="w-12 h-12 rounded-full bg-slate-900 text-amber-400 border-2 border-amber-400 flex items-center justify-center font-bold text-lg shadow shrink-0">
+          <img
+            src={schoolConfig.logoUrl}
+            alt="School Logo"
+            className="w-12 h-12 rounded-full object-cover border-2 border-amber-400 shadow shrink-0 bg-white"
+            onError={(e) => {
+              e.currentTarget.style.display = 'none';
+              if (e.currentTarget.nextElementSibling) {
+                e.currentTarget.nextElementSibling.classList.remove('hidden');
+                e.currentTarget.nextElementSibling.classList.add('flex');
+              }
+            }}
+          />
+          <div className="w-12 h-12 rounded-full bg-slate-900 text-amber-400 border-2 border-amber-400 hidden items-center justify-center font-bold text-lg shadow shrink-0">
             SS
           </div>
           <div>

@@ -6,6 +6,7 @@ import AdminDashboard from './AdminDashboard';
 import TeacherDashboard from './TeacherDashboard';
 import StudentDashboard from './StudentDashboard';
 import { LogOut, Shield } from 'lucide-react';
+import schoolConfig from '@shared/school.config';
 
 const getRoleType = (role) => {
   if (!role) return 'student';
@@ -42,7 +43,19 @@ export default function DashboardLayout() {
           
           <div className="flex items-center gap-3">
             <Link to="/" className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-full bg-amber-400 text-slate-950 flex items-center justify-center font-bold text-sm">
+              <img
+                src={schoolConfig.logoUrl}
+                alt="School Logo"
+                className="w-8 h-8 rounded-full object-cover border border-amber-400 shadow shrink-0 bg-white"
+                onError={(e) => {
+                  e.currentTarget.style.display = 'none';
+                  if (e.currentTarget.nextElementSibling) {
+                    e.currentTarget.nextElementSibling.classList.remove('hidden');
+                    e.currentTarget.nextElementSibling.classList.add('flex');
+                  }
+                }}
+              />
+              <div className="w-8 h-8 rounded-full bg-amber-400 text-slate-950 hidden items-center justify-center font-bold text-sm">
                 ZP
               </div>
               <span className="font-bold text-sm text-white hidden sm:inline">{t('auth.schoolPortal')}</span>

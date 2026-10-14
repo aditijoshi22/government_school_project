@@ -16,7 +16,19 @@ export default function Footer() {
         {/* Column 1: School Overview & UDISE */}
         <div className="space-y-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-amber-500 text-slate-950 flex items-center justify-center font-extrabold text-base shadow shrink-0">
+            <img
+              src={schoolConfig.logoUrl}
+              alt="School Logo"
+              className="w-10 h-10 rounded-full object-cover border border-amber-400 shadow shrink-0 bg-white"
+              onError={(e) => {
+                e.currentTarget.style.display = 'none';
+                if (e.currentTarget.nextElementSibling) {
+                  e.currentTarget.nextElementSibling.classList.remove('hidden');
+                  e.currentTarget.nextElementSibling.classList.add('flex');
+                }
+              }}
+            />
+            <div className="w-10 h-10 rounded-full bg-amber-500 text-slate-950 hidden items-center justify-center font-extrabold text-base shadow shrink-0">
               SS
             </div>
             <div>

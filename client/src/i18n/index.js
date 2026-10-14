@@ -45,31 +45,34 @@ const legacyEn = buildLegacyMappings(enLocales);
 const legacyMr = buildLegacyMappings(mrLocales);
 const legacyHi = buildLegacyMappings(hiLocales);
 
-const resources = {
-  en: {
+function buildResource(locales, legacy = {}) {
+  const res = {
     translation: {
-      ...enLocales,
-      ...legacyEn
-    },
-    ...enLocales,
-    ...legacyEn
-  },
-  mr: {
-    translation: {
-      ...mrLocales,
-      ...legacyMr
-    },
-    ...mrLocales,
-    ...legacyMr
-  },
-  hi: {
-    translation: {
-      ...hiLocales,
-      ...legacyHi
-    },
-    ...hiLocales,
-    ...legacyHi
+      ...locales,
+      ...locales.common,
+      ...legacy
+    }
+  };
+
+  for (const [ns, content] of Object.entries(locales)) {
+    res[ns] = {
+      ...content,
+      [ns]: content,
+      common: locales.common,
+      ...locales.common
+    };
   }
+
+  // Also include legacy mappings at top level
+  Object.assign(res, legacy);
+
+  return res;
+}
+
+const resources = {
+  en: buildResource(enLocales, legacyEn),
+  mr: buildResource(mrLocales, legacyMr),
+  hi: buildResource(hiLocales, legacyHi)
 };
 
 const savedLng = typeof window !== 'undefined' ? (localStorage.getItem('i18nextLng') || 'en') : 'en';
@@ -83,6 +86,7 @@ i18n
     resources,
     lng: initialLng,
     fallbackLng: 'en',
+    fallbackNS: ['translation', 'common'],
     supportedLngs: ['en', 'mr', 'hi'],
     ns: [
       'common', 'navbar', 'footer', 'home', 'about', 'sections',

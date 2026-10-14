@@ -50,10 +50,22 @@ export default function Home() {
         
         <div className="max-w-7xl mx-auto px-4 py-16 md:py-24 relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
           <div className="lg:col-span-8 space-y-6">
-            <span className="inline-flex items-center gap-2 bg-amber-400 text-slate-950 font-extrabold text-xs px-3.5 py-1.5 rounded-full uppercase tracking-wider shadow">
-              <Sparkles className="w-3.5 h-3.5" />
-              {t('navbar.levelsSubtitle', 'Primary • Secondary • Junior College')}
-            </span>
+            <div className="flex items-center gap-4">
+              <img
+                src={schoolConfig.logoUrl}
+                alt="School Logo"
+                className="w-16 h-16 md:w-20 md:h-20 rounded-2xl object-cover border-2 border-amber-400 shadow-xl bg-white p-0.5 shrink-0"
+              />
+              <div className="space-y-1.5">
+                <span className="inline-flex items-center gap-2 bg-amber-400 text-slate-950 font-extrabold text-xs px-3.5 py-1.5 rounded-full uppercase tracking-wider shadow">
+                  <Sparkles className="w-3.5 h-3.5" />
+                  {t('navbar.levelsSubtitle', 'Primary • Secondary • Junior College')}
+                </span>
+                <p className="text-xs text-amber-300/90 font-medium">
+                  {currentLang === 'mr' ? schoolConfig.nameMarathi : currentLang === 'hi' ? schoolConfig.nameHindi : schoolConfig.name}
+                </p>
+              </div>
+            </div>
             <h1 className="text-3xl md:text-5xl font-extrabold tracking-tight leading-tight">
               {t('home.heroTitle', schoolConfig.projectShortName)}
             </h1>
