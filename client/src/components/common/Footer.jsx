@@ -12,9 +12,17 @@ export default function Footer() {
         {/* Column 1: School Overview & UDISE */}
         <div className="space-y-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-amber-500 text-slate-950 flex items-center justify-center font-extrabold text-base shadow">
-              ZP
-            </div>
+            {schoolConfig.logoUrl ? (
+              <img
+                src={schoolConfig.logoUrl}
+                alt={schoolConfig.shortName}
+                className="w-10 h-10 rounded-full object-contain bg-white border border-amber-400 p-0.5 shadow shrink-0"
+              />
+            ) : (
+              <div className="w-10 h-10 rounded-full bg-amber-500 text-slate-950 flex items-center justify-center font-extrabold text-base shadow shrink-0">
+                ZP
+              </div>
+            )}
             <div>
               <h3 className="font-bold text-white text-base leading-snug">{schoolConfig.shortName}</h3>
               <p className="text-xs text-amber-400 font-mono">UDISE: {schoolConfig.udiseCode}</p>

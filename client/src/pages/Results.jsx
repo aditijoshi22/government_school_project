@@ -158,7 +158,14 @@ export default function Results() {
             <div id="printable-area" className="bg-white text-slate-900 border-4 border-slate-900 rounded-3xl p-8 shadow-2xl space-y-6">
               
               {/* Marksheet Header */}
-              <div className="border-b-2 border-slate-900 pb-6 text-center space-y-1">
+              <div className="border-b-2 border-slate-900 pb-6 text-center space-y-2">
+                {schoolConfig.logoUrl && (
+                  <img
+                    src={schoolConfig.logoUrl}
+                    alt={schoolConfig.name}
+                    className="w-16 h-16 rounded-full object-contain mx-auto border border-slate-300 p-0.5 shadow-sm"
+                  />
+                )}
                 <div className="font-mono text-xs font-bold text-slate-500 uppercase tracking-widest">
                   GOVERNMENT OF MAHARASHTRA • ZILLA PARISHAD EDUCATION BOARD
                 </div>

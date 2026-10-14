@@ -33,9 +33,17 @@ export default function Login() {
       <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-8 shadow-2xl max-w-md w-full space-y-6">
 
         <div className="text-center space-y-2">
-          <div className="w-14 h-14 rounded-full bg-slate-900 text-amber-400 border-2 border-amber-400 mx-auto flex items-center justify-center font-extrabold text-xl shadow">
-            ZP
-          </div>
+          {schoolConfig.logoUrl ? (
+            <img
+              src={schoolConfig.logoUrl}
+              alt={schoolConfig.name}
+              className="w-16 h-16 rounded-full object-contain bg-white border-2 border-amber-400 p-1 mx-auto shadow"
+            />
+          ) : (
+            <div className="w-14 h-14 rounded-full bg-slate-900 text-amber-400 border-2 border-amber-400 mx-auto flex items-center justify-center font-extrabold text-xl shadow">
+              ZP
+            </div>
+          )}
           <h2 className="text-2xl font-extrabold text-slate-900 dark:text-white">Portal Staff & Student Login</h2>
           <p className="text-xs text-slate-500">Access role-based management dashboards</p>
         </div>

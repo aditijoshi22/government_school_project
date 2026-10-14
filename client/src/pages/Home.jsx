@@ -41,13 +41,24 @@ export default function Home() {
         
         <div className="max-w-7xl mx-auto px-4 py-16 md:py-24 relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
           <div className="lg:col-span-8 space-y-6">
-            <span className="inline-flex items-center gap-2 bg-amber-400 text-slate-950 font-extrabold text-xs px-3.5 py-1.5 rounded-full uppercase tracking-wider shadow">
-              <Sparkles className="w-3.5 h-3.5" />
-              Goverment Accredited • UDISE: {schoolConfig.udiseCode}
-            </span>
-            <h1 className="text-3xl md:text-5xl font-extrabold tracking-tight leading-tight">
-              {schoolConfig.name}
-            </h1>
+            <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+              {schoolConfig.logoUrl && (
+                <img
+                  src={schoolConfig.logoUrl}
+                  alt={schoolConfig.name}
+                  className="w-16 h-16 md:w-20 md:h-20 rounded-full object-contain bg-white border-2 border-amber-400 p-1 shadow-lg shrink-0"
+                />
+              )}
+              <div>
+                <span className="inline-flex items-center gap-2 bg-amber-400 text-slate-950 font-extrabold text-xs px-3.5 py-1.5 rounded-full uppercase tracking-wider shadow mb-2">
+                  <Sparkles className="w-3.5 h-3.5" />
+                  Goverment Accredited • UDISE: {schoolConfig.udiseCode}
+                </span>
+                <h1 className="text-3xl md:text-5xl font-extrabold tracking-tight leading-tight">
+                  {schoolConfig.name}
+                </h1>
+              </div>
+            </div>
             <p className="text-amber-300 font-devanagari text-lg md:text-xl font-medium">
               {schoolConfig.nameMarathi}
             </p>

@@ -24,8 +24,8 @@ const schoolConfig = {
     addressMarathi: "स्टेशन रोड, तहसील कार्यालयाजवळ, अंजनगाव सुर्जी, जिल्हा अमरावती, महाराष्ट्र - ४४४७०५",
     phone: "+91 721 2345678",
     altPhone: "+91 94228 12345",
-    email: "zphs.anjangaon@mahaschool.gov.in",
-    altEmail: "principal.zphs.anjangaon@gmail.com",
+    email: "adarshvjnt@gmail.com",
+    altEmail: "adarshvjnt@gmail.com",
     officeHours: "Monday to Saturday: 9:30 AM - 5:00 PM",
     googleMapsEmbedUrl: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3722.585521487654!2d77.309875!3d21.161111!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMjHCsDA5JzQwLjAiTiA3N8KwMTgnMzUuNSJF!5e0!3m2!1sen!2sin!4v1620000000000!5m2!1sen!2sin"
   },
@@ -39,7 +39,7 @@ const schoolConfig = {
     youtube: "https://youtube.com",
     twitter: "https://twitter.com"
   },
-  logoUrl: "/assets/school-logo.svg",
+  logoUrl: "/assets/school-logo.jpg",
   stats: {
     totalStudents: 1280,
     totalTeachers: 48,

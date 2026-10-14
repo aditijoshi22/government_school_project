@@ -43,9 +43,17 @@ export default function Navbar() {
       {/* Brand Header */}
       <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
         <Link to="/" className="flex items-center gap-3 group">
-          <div className="w-12 h-12 rounded-full bg-slate-900 text-amber-400 border-2 border-amber-400 flex items-center justify-center font-bold text-lg shadow">
-            ZP
-          </div>
+          {schoolConfig.logoUrl ? (
+            <img
+              src={schoolConfig.logoUrl}
+              alt={displayName}
+              className="w-12 h-12 rounded-full object-contain bg-white border-2 border-amber-400 p-0.5 shadow shrink-0"
+            />
+          ) : (
+            <div className="w-12 h-12 rounded-full bg-slate-900 text-amber-400 border-2 border-amber-400 flex items-center justify-center font-bold text-lg shadow shrink-0">
+              ZP
+            </div>
+          )}
           <div>
             <h1 className="text-lg md:text-xl font-bold text-slate-900 dark:text-white leading-tight group-hover:text-blue-700 dark:group-hover:text-blue-400 transition">
               {displayName}
