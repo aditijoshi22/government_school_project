@@ -1,0 +1,12 @@
+{
+  "required": "This field is required.",
+  "invalidEmail": "Please enter a valid email address.",
+  "invalidPhone": "Please enter a valid 10-digit phone number.",
+  "minLength": "Content is too short.",
+  "maxLength": "Content exceeds maximum length.",
+  "invalidDate": "Please provide a valid date.",
+  "numberOnly": "Please enter numbers only.",
+  "fileTooLarge": "File size exceeds the 5MB limit.",
+  "unsupportedFileType": "Only PDF, JPG, and PNG files are accepted.",
+  "formHasErrors": "Please fix errors before submitting the form."
+}

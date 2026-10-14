@@ -1,0 +1,11 @@
+{
+  "serverError": "Submission failed. Please check fields and try again.",
+  "networkError": "Unable to load notices. Please check your network connection.",
+  "notFound": "The requested resource was not found.",
+  "unauthorized": "Unauthorized: Please log in to proceed.",
+  "forbidden": "Forbidden: Access is denied.",
+  "loadFailed": "Failed to load data. Please refresh.",
+  "updateFailed": "Failed to update record.",
+  "deleteFailed": "Failed to delete record.",
+  "unexpectedError": "An unexpected error occurred."
+}

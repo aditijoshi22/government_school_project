@@ -3,33 +3,32 @@ import { useTranslation } from 'react-i18next';
 import axios from 'axios';
 import PageHeader from '../components/common/PageHeader';
 import Modal from '../components/common/Modal';
-import { SECTIONS_CONFIG } from '@shared/sections.config';
-import { Image as ImageIcon, Calendar, X } from 'lucide-react';
+import { SECTIONS_CONFIG, getSectionName } from '@shared/sections.config';
+import { Image as ImageIcon, Calendar } from 'lucide-react';
 import { getLocalizedText } from '../utils/bilingual';
 
 export default function Gallery() {
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation(['gallery', 'common']);
   const [albums, setAlbums] = useState([]);
   const [selectedSection, setSelectedSection] = useState('all');
   const [activeAlbum, setActiveAlbum] = useState(null);
 
   useEffect(() => {
-    axios.get(`/api/public/gallery?section=${selectedSection}`)
+    axios.get(`/api/public/gallery?section=${selectedSection}&lang=${i18n.language}`)
       .then(res => {
         if (res.data.success) {
           setAlbums(res.data.data);
         }
       })
       .catch(err => console.error(err));
-  }, [selectedSection]);
+  }, [selectedSection, i18n.language]);
 
   return (
     <div className="space-y-12 pb-16">
       <PageHeader
-        title="Photo Gallery & Event Highlights"
-        titleMr="चित्रदालन व उपक्रम फोटो"
-        subtitle="Visual memories of cultural events, sports meets, science fairs, and school celebrations."
-        badgeText="Visual Showcase"
+        title={t('gallery.pageTitle')}
+        subtitle={t('gallery.pageSubtitle')}
+        badgeText={t('gallery.badge')}
       />
 
       <div className="max-w-7xl mx-auto px-4 space-y-8">
@@ -44,7 +43,7 @@ export default function Gallery() {
                 : 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300'
             }`}
           >
-            {i18n.language === 'mr' ? 'सर्व अल्बम' : 'All Albums'}
+            {i18n.language === 'mr' ? 'सर्व अल्बम' : i18n.language === 'hi' ? 'सभी एल्बम' : 'All Albums'}
           </button>
           {SECTIONS_CONFIG.map(s => (
             <button
@@ -60,7 +59,7 @@ export default function Gallery() {
                 borderColor: selectedSection === s.id ? s.themeColor : undefined
               }}
             >
-              {s.shortName}
+              {getSectionName(s, i18n.language)}
             </button>
           ))}
         </div>
@@ -98,7 +97,7 @@ export default function Gallery() {
                   </p>
                   <div className="text-xs font-bold text-amber-600 dark:text-amber-400 pt-1 flex items-center gap-1">
                     <ImageIcon className="w-3.5 h-3.5" />
-                    <span>{i18n.language === 'mr' ? 'फोटो पहा' : 'View Photos'} ({album.images?.length || 1})</span>
+                    <span>{t('gallery.viewAlbum')} ({album.images?.length || 1})</span>
                   </div>
                 </div>
               </div>
@@ -110,7 +109,7 @@ export default function Gallery() {
         <Modal
           isOpen={!!activeAlbum}
           onClose={() => setActiveAlbum(null)}
-          title={getLocalizedText(activeAlbum, 'title', i18n.language) || 'Album Photos'}
+          title={getLocalizedText(activeAlbum, 'title', i18n.language) || t('gallery.viewAlbum')}
           maxWidth="max-w-4xl"
         >
           <div className="space-y-4">
@@ -136,3 +135,4 @@ export default function Gallery() {
     </div>
   );
 }
+

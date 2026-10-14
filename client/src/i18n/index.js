@@ -2,186 +2,117 @@ import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
 
+import enLocales from '../locales/en/index.js';
+import mrLocales from '../locales/mr/index.js';
+import hiLocales from '../locales/hi/index.js';
+
+// Backward compatibility helper mapping old keys
+const buildLegacyMappings = (locales) => ({
+  nav: locales.navbar,
+  hero: {
+    welcomeTitle: locales.home.heroTitle,
+    subtitle: locales.common.siteTitle,
+    exploreSections: locales.home.ourSchoolsTitle,
+    applyAdmission: locales.home.applyAdmission
+  },
+  sections: {
+    title: locales.sections.pageTitle,
+    primaryDesc: locales.about.primarySummary,
+    secondaryDesc: locales.about.secondarySummary,
+    highSchoolDesc: locales.about.highSchoolSummary
+  },
+  resultLookup: {
+    title: locales.results.pageTitle,
+    rollNo: locales.results.rollNumber,
+    dob: locales.results.dob,
+    selectSection: locales.results.selectSection,
+    selectClass: locales.results.selectClass,
+    searchBtn: locales.results.searchBtn
+  },
+  roles: {
+    adminDashboard: locales.auth.superAdmin,
+    teacherDashboard: locales.dashboard.teacherDashboard,
+    studentDashboard: locales.dashboard.studentDashboard,
+    enterMarks: locales.dashboard.enterMarks,
+    myResults: locales.dashboard.myResults,
+    myAttendance: locales.dashboard.myAttendance,
+    latestNotices: locales.home.latestNotices,
+    noNoticesAvailable: locales.dashboard.noNotices
+  }
+});
+
+const legacyEn = buildLegacyMappings(enLocales);
+const legacyMr = buildLegacyMappings(mrLocales);
+const legacyHi = buildLegacyMappings(hiLocales);
+
 const resources = {
   en: {
     translation: {
-      nav: {
-        home: "Home",
-        about: "About Us",
-        sections: "Our Schools",
-        prePrimary: "Primary (1-4)",
-        primary: "Primary (1-4)",
-        secondary: "Secondary & SSC (5-10)",
-        highSchool: "High School & HSC (11-12)",
-        admissions: "Admissions",
-        examinations: "Examinations",
-        results: "Results & Report Cards",
-        staff: "Staff Directory",
-        facilities: "Facilities",
-        notices: "Notices & Circulars",
-        gallery: "Events & Gallery",
-        studentCorner: "Student Corner",
-        schemes: "Government Schemes",
-        downloads: "Downloads",
-        contact: "Contact Us",
-        login: "Portal Login",
-        dashboard: "Dashboard"
-      },
-      hero: {
-        welcomeTitle: "Quality Education for Bright Futures",
-        subtitle: "Shiksha Sahayak - School Information and Management",
-        exploreSections: "Explore Academic Sections",
-        applyAdmission: "Apply Online Admission 2026-27"
-      },
-      sections: {
-        title: "Our Academic Sections",
-        primaryDesc: "Class 1 to 4 - Activity-based learning, descriptive grades, and child-centric care.",
-        secondaryDesc: "Class 5 to 10 - State curriculum, Class 5 & 8 Scholarship exam prep & Class 10 SSC Board.",
-        highSchoolDesc: "Class 11 & 12 - Science, Commerce & Arts streams, HSC Board & Competitive Entrance Cell."
-      },
-      resultLookup: {
-        title: "Online Result & Progress Report Portal",
-        rollNo: "Roll Number",
-        dob: "Date of Birth",
-        selectSection: "Select Section",
-        selectClass: "Select Class",
-        searchBtn: "View Marksheet / Progress Report"
-      },
-      roles: {
-        adminDashboard: "Admin Dashboard",
-        teacherDashboard: "Teacher Dashboard",
-        studentDashboard: "Student Dashboard",
-        enterMarks: "Enter Marks",
-        myResults: "My Results",
-        myAttendance: "My Attendance",
-        latestNotices: "Latest Notices",
-        noNoticesAvailable: "No notices available."
-      }
-    }
+      ...enLocales,
+      ...legacyEn
+    },
+    ...enLocales,
+    ...legacyEn
   },
   mr: {
     translation: {
-      nav: {
-        home: "मुख्य पृष्ठ",
-        about: "आमच्याबद्दल",
-        sections: "आमच्या शाळा",
-        prePrimary: "प्राथमिक (इयत्ता १ ते ४)",
-        primary: "प्राथमिक (इयत्ता १ ते ४)",
-        secondary: "माध्यमिक (इयत्ता ५ ते १०)",
-        highSchool: "उच्च माध्यमिक (इयत्ता ११ व १२)",
-        admissions: "प्रवेश प्रक्रिया",
-        examinations: "परीक्षा व वेळापत्रक",
-        results: "निकाल व प्रगती पुस्तक",
-        staff: "शिक्षक व कर्मचारी",
-        facilities: "सुविधा",
-        notices: "सूचना व परिपत्रके",
-        gallery: "गॅलरी व उपक्रम",
-        studentCorner: "विद्यार्थी कोपरा",
-        schemes: "शासकीय योजना",
-        downloads: "डाउनलोड्स",
-        contact: "संपर्क",
-        login: "पोर्टल लॉगिन",
-        dashboard: "डॅशबोर्ड"
-      },
-      hero: {
-        welcomeTitle: "उज्वल भविष्यासाठी गुणवत्तेची शिक्षण परंपरा",
-        subtitle: "Shiksha Sahayak - School Information and Management",
-        exploreSections: "विभाग पहा",
-        applyAdmission: "ऑनलाइन प्रवेश अर्ज २०२६-२७"
-      },
-      sections: {
-        title: "आमचे शैक्षणिक विभाग",
-        primaryDesc: "इयत्ता १ ते ४ - आनंददायी शिक्षण, गुण-विरहीत मूल्यमापन व बालस्नेही वातावरण.",
-        secondaryDesc: "इयत्ता ५ ते १० - राज्य अभ्यासक्रम, इयत्ता ५ वी व ८ वी शिष्यवृत्ती परीक्षा व १० वी SSC बोर्ड तयारी.",
-        highSchoolDesc: "इयत्ता ११ वी व १२ वी - विज्ञान, वाणिज्य व कला शाखा, HSC बोर्ड व स्पर्धा परीक्षा मार्गदर्शन."
-      },
-      resultLookup: {
-        title: "ऑनलाइन निकाल व प्रगती पुस्तक कक्ष",
-        rollNo: "हजेरी क्रमांक (Roll No)",
-        dob: "जन्म तारीख",
-        selectSection: "विभाग निवडा",
-        selectClass: "इयत्ता निवडा",
-        searchBtn: "निकाल / प्रगती पुस्तक पहा"
-      },
-      roles: {
-        adminDashboard: "प्रशासन डॅशबोर्ड",
-        teacherDashboard: "शिक्षक डॅशबोर्ड",
-        studentDashboard: "विद्यार्थी डॅशबोर्ड",
-        enterMarks: "गुण नोंदी",
-        myResults: "माझे निकाल",
-        myAttendance: "माझी उपस्थिती",
-        latestNotices: "नवीनतम सूचना",
-        noNoticesAvailable: "कोणतीही सूचना उपलब्ध नाही."
-      }
-    }
+      ...mrLocales,
+      ...legacyMr
+    },
+    ...mrLocales,
+    ...legacyMr
   },
   hi: {
     translation: {
-      nav: {
-        home: "मुख्य पृष्ठ",
-        about: "हमारे बारे में",
-        sections: "हमारे विद्यालय",
-        prePrimary: "प्राथमिक (कक्षा 1 से 4)",
-        primary: "प्राथमिक (कक्षा 1 से 4)",
-        secondary: "माध्यमिक (कक्षा 5 से 10)",
-        highSchool: "उच्च माध्यमिक (कक्षा 11 व 12)",
-        admissions: "प्रवेश प्रक्रिया",
-        examinations: "परीक्षा व समय सारणी",
-        results: "परीक्षा परिणाम",
-        staff: "शिक्षक एवं कर्मचारी",
-        facilities: "सुविधाएं",
-        notices: "सूचना एवं परिपत्र",
-        gallery: "गैलरी एवं गतिविधियां",
-        studentCorner: "छात्र कोना",
-        schemes: "सरकारी योजनाएं",
-        downloads: "डाउनलोड",
-        contact: "संपर्क करें",
-        login: "पोर्टल लॉगिन",
-        dashboard: "डैशबोर्ड"
-      },
-      hero: {
-        welcomeTitle: "उज्ज्वल भविष्य के लिए गुणवत्तापूर्ण शिक्षा",
-        subtitle: "Shiksha Sahayak - School Information and Management",
-        exploreSections: "विभाग देखें",
-        applyAdmission: "ऑनलाइन प्रवेश आवेदन 2026-27"
-      },
-      sections: {
-        title: "हमारे शैक्षणिक विभाग",
-        primaryDesc: "कक्षा 1 से 4 - गतिविधि आधारित शिक्षा एवं बाल सुलभ वातावरण।",
-        secondaryDesc: "कक्षा 5 से 10 - राज्य पाठ्यक्रम, कक्षा 5 एवं 8 छात्रवृत्ति परीक्षा व SSC बोर्ड तैयारी।",
-        highSchoolDesc: "कक्षा 11 एवं 12 - विज्ञान, वाणिज्य व कला संकाय, HSC बोर्ड व प्रतियोगी परीक्षा मार्गदर्शन।"
-      },
-      resultLookup: {
-        title: "ऑनलाइन परिणाम पोर्टल",
-        rollNo: "अनुक्रमांक (Roll No)",
-        dob: "जन्म तिथि",
-        selectSection: "विभाग चुनें",
-        selectClass: "कक्षा चुनें",
-        searchBtn: "परिणाम देखें"
-      },
-      roles: {
-        adminDashboard: "प्रशासन डैशबोर्ड",
-        teacherDashboard: "शिक्षक डैशबोर्ड",
-        studentDashboard: "छात्र डैशबोर्ड",
-        enterMarks: "अंक प्रविष्टि",
-        myResults: "मेरे परिणाम",
-        myAttendance: "मेरी उपस्थिति",
-        latestNotices: "नवीनतम सूचनाएं",
-        noNoticesAvailable: "कोई सूचना उपलब्ध नहीं है।"
-      }
-    }
+      ...hiLocales,
+      ...legacyHi
+    },
+    ...hiLocales,
+    ...legacyHi
   }
 };
+
+const savedLng = typeof window !== 'undefined' ? (localStorage.getItem('i18nextLng') || 'en') : 'en';
+// Normalize language codes like mr-IN to mr
+const initialLng = savedLng.startsWith('mr') ? 'mr' : savedLng.startsWith('hi') ? 'hi' : 'en';
 
 i18n
   .use(LanguageDetector)
   .use(initReactI18next)
   .init({
     resources,
+    lng: initialLng,
     fallbackLng: 'en',
+    supportedLngs: ['en', 'mr', 'hi'],
+    ns: [
+      'common', 'navbar', 'footer', 'home', 'about', 'sections',
+      'admissions', 'results', 'notices', 'gallery', 'staff',
+      'facilities', 'contact', 'auth', 'dashboard', 'validation', 'errors'
+    ],
+    defaultNS: 'translation',
     interpolation: {
       escapeValue: false
+    },
+    detection: {
+      order: ['localStorage', 'navigator'],
+      caches: ['localStorage'],
+      lookupLocalStorage: 'i18nextLng'
     }
   });
+
+// Synchronize document.documentElement.lang and store choice on change
+if (typeof document !== 'undefined') {
+  document.documentElement.lang = i18n.language || 'en';
+}
+
+i18n.on('languageChanged', (lng) => {
+  const normLng = lng.startsWith('mr') ? 'mr' : lng.startsWith('hi') ? 'hi' : 'en';
+  if (typeof document !== 'undefined') {
+    document.documentElement.lang = normLng;
+  }
+  if (typeof window !== 'undefined') {
+    localStorage.setItem('i18nextLng', normLng);
+  }
+});
 
 export default i18n;

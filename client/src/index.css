@@ -6,7 +6,12 @@
   body {
     @apply bg-slate-50 text-slate-900 font-sans;
   }
+
+  html[lang="mr"], html[lang="hi"], [lang="mr"], [lang="hi"] {
+    font-family: 'Noto Sans Devanagari', 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  }
 }
+
 
 /* Custom Accessibility High Contrast Mode */
 .high-contrast {

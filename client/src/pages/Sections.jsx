@@ -1,16 +1,17 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { useParams, Link } from 'react-router-dom';
-import axios from 'axios';
+import { useTranslation } from 'react-i18next';
 import PageHeader from '../components/common/PageHeader';
-import { SECTIONS_CONFIG, getSectionById } from '@shared/sections.config';
-import { Sparkles, BookOpen, GraduationCap, Download, Calendar, CheckCircle, FileText, Award, Layers } from 'lucide-react';
+import { SECTIONS_CONFIG, getSectionById, getSectionSchoolName, getSectionDescription, getSectionClasses } from '@shared/sections.config';
+import { Sparkles, BookOpen, GraduationCap, Download, CheckCircle, Award, Layers } from 'lucide-react';
 
 export default function Sections() {
+  const { t, i18n } = useTranslation();
   const { sectionId } = useParams();
   const activeSectionId = sectionId || 'primary';
   const section = getSectionById(activeSectionId) || SECTIONS_CONFIG[0];
 
-  const [academicsData, setAcademicsData] = useState(null);
+  const currentLang = i18n.language?.startsWith('mr') ? 'mr' : i18n.language?.startsWith('hi') ? 'hi' : 'en';
 
   const getSectionIcon = (iconName) => {
     switch (iconName) {
@@ -21,52 +22,84 @@ export default function Sections() {
     }
   };
 
+  const schoolName = getSectionSchoolName(section, currentLang);
+  const description = getSectionDescription(section, currentLang);
+  const classes = getSectionClasses(section, currentLang);
+  const rangeLabel = classes.length > 0 ? `${classes[0]} - ${classes[classes.length - 1]}` : '';
+  const levelName = typeof section.schoolLevel === 'object' ? (section.schoolLevel[currentLang] || section.schoolLevel.en) : section.schoolLevel;
+  const roleName = typeof section.sectionHeadRole === 'object' ? (section.sectionHeadRole[currentLang] || section.sectionHeadRole.en) : section.sectionHeadRole;
+  const featuresList = section.features?.[currentLang] || section.features?.en || (Array.isArray(section.features) ? section.features : []);
+
+  const getAssessmentLabel = () => {
+    if (section.assessmentType === 'grade-based') return t('sections.gradeBasedAssessment');
+    if (section.assessmentType === 'marks-with-streams') return t('sections.marksWithStreamsAssessment');
+    return t('sections.marksAssessment');
+  };
+
   return (
     <div className="space-y-12 pb-16">
       <PageHeader
-        title={section.schoolName}
-        subtitle={section.description}
+        title={schoolName}
+        subtitle={description}
         themeColor={section.themeColor}
-        badgeText={`${section.schoolLevel} • ${section.classList[0]} to ${section.classList[section.classList.length - 1]}`}
+        badgeText={`${levelName} • ${rangeLabel}`}
       />
 
       <div className="max-w-7xl mx-auto px-4 space-y-10">
         
         {/* Section Selection Quick Tabs */}
         <div className="flex items-center justify-center gap-3 overflow-x-auto pb-2">
-          {SECTIONS_CONFIG.map(sec => (
-            <Link
-              key={sec.id}
-              to={`/sections/${sec.id}`}
-              className={`px-5 py-3 rounded-2xl font-bold text-xs md:text-sm border transition flex items-center gap-2 ${
-                sec.id === activeSectionId
-                  ? 'text-white shadow-lg'
-                  : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-50'
-              }`}
-              style={{
-                backgroundColor: sec.id === activeSectionId ? sec.themeColor : undefined,
-                borderColor: sec.id === activeSectionId ? sec.themeColor : undefined
-              }}
-            >
-              {getSectionIcon(sec.iconName)}
-              <span>{sec.schoolShortName}</span>
-            </Link>
-          ))}
+          {SECTIONS_CONFIG.map(sec => {
+            const secName = typeof sec.schoolShortName === 'object' ? (sec.schoolShortName[currentLang] || sec.schoolShortName.en) : sec.schoolShortName;
+            return (
+              <Link
+                key={sec.id}
+                to={`/sections/${sec.id}`}
+                className={`px-5 py-3 rounded-2xl font-bold text-xs md:text-sm border transition flex items-center gap-2 ${
+                  sec.id === activeSectionId
+                    ? 'text-white shadow-lg'
+                    : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-50'
+                }`}
+                style={{
+                  backgroundColor: sec.id === activeSectionId ? sec.themeColor : undefined,
+                  borderColor: sec.id === activeSectionId ? sec.themeColor : undefined
+                }}
+              >
+                {getSectionIcon(sec.iconName)}
+                <span>{secName}</span>
+              </Link>
+            );
+          })}
         </div>
 
         {/* School Info Summary */}
         <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-sm" style={{ borderTop: `4px solid ${section.themeColor}` }}>
-          <div className="text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1">School Information</div>
-          <h2 className="text-xl md:text-2xl font-extrabold text-slate-900 dark:text-white" style={{ color: section.themeColor }}>{section.schoolName}</h2>
+          <div className="text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1">{t('sections.badge', 'School Information')}</div>
+          <h2 className="text-xl md:text-2xl font-extrabold text-slate-900 dark:text-white" style={{ color: section.themeColor }}>{schoolName}</h2>
           <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mt-4 text-xs">
-            <div className="bg-slate-50 dark:bg-slate-800 p-3 rounded-2xl"><div className="text-slate-500">UDISE Code</div><div className="font-bold font-mono text-slate-900 dark:text-white">{section.udiseCode}</div></div>
-            <div className="bg-slate-50 dark:bg-slate-800 p-3 rounded-2xl"><div className="text-slate-500">Level</div><div className="font-bold text-slate-900 dark:text-white">{section.schoolLevel}</div></div>
-            <div className="bg-slate-50 dark:bg-slate-800 p-3 rounded-2xl"><div className="text-slate-500">Classes</div><div className="font-bold text-slate-900 dark:text-white">{section.classList[0]} to {section.classList[section.classList.length - 1]}</div></div>
-            <div className="bg-slate-50 dark:bg-slate-800 p-3 rounded-2xl"><div className="text-slate-500">{section.sectionHeadRole}</div><div className="font-bold text-slate-900 dark:text-white">{section.sectionHead}</div></div>
-            <div className="bg-slate-50 dark:bg-slate-800 p-3 rounded-2xl"><div className="text-slate-500">Assessment</div><div className="font-bold text-slate-900 dark:text-white capitalize">{section.assessmentType.replace(/-/g, ' ')}</div></div>
+            <div className="bg-slate-50 dark:bg-slate-800 p-3 rounded-2xl">
+              <div className="text-slate-500">{t('sections.udiseCode', 'UDISE Code')}</div>
+              <div className="font-bold font-mono text-slate-900 dark:text-white">{section.udiseCode}</div>
+            </div>
+            <div className="bg-slate-50 dark:bg-slate-800 p-3 rounded-2xl">
+              <div className="text-slate-500">{t('sections.level', 'Level')}</div>
+              <div className="font-bold text-slate-900 dark:text-white">{levelName}</div>
+            </div>
+            <div className="bg-slate-50 dark:bg-slate-800 p-3 rounded-2xl">
+              <div className="text-slate-500">{t('sections.classes', 'Classes')}</div>
+              <div className="font-bold text-slate-900 dark:text-white">{rangeLabel}</div>
+            </div>
+            <div className="bg-slate-50 dark:bg-slate-800 p-3 rounded-2xl">
+              <div className="text-slate-500">{t('sections.sectionHead', 'Section Head')}</div>
+              <div className="font-bold text-slate-900 dark:text-white">{section.sectionHead}</div>
+            </div>
+            <div className="bg-slate-50 dark:bg-slate-800 p-3 rounded-2xl">
+              <div className="text-slate-500">{t('sections.assessment', 'Assessment')}</div>
+              <div className="font-bold text-slate-900 dark:text-white capitalize">{section.assessmentType.replace(/-/g, ' ')}</div>
+            </div>
           </div>
           <ul className="grid grid-cols-1 md:grid-cols-2 gap-2 mt-4">
-            {section.features.map((f, i) => (
+            {featuresList.map((f, i) => (
               <li key={i} className="flex items-start gap-2 text-xs text-slate-700 dark:text-slate-300">
                 <CheckCircle className="w-3.5 h-3.5 text-emerald-500 shrink-0 mt-0.5" /><span>{f}</span>
               </li>
@@ -84,17 +117,17 @@ export default function Sections() {
             <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-sm space-y-4">
               <h3 className="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2" style={{ color: section.themeColor }}>
                 <Layers className="w-5 h-5" />
-                <span>Class Structure & Assessment Mode</span>
+                <span>{t('sections.overview', 'Class Structure & Assessment Mode')}</span>
               </h3>
               <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
-                {section.description}
+                {description}
               </p>
 
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 pt-2">
-                {section.classList.map((cls, idx) => (
+                {classes.map((cls, idx) => (
                   <div key={idx} className="bg-slate-50 dark:bg-slate-800 p-3 rounded-2xl text-center border border-slate-100 dark:border-slate-800">
                     <div className="font-extrabold text-slate-900 dark:text-white text-sm">{cls}</div>
-                    <div className="text-[10px] text-slate-500">Divisions A & B</div>
+                    <div className="text-[10px] text-slate-500">{currentLang === 'mr' ? 'तुकडी अ व ब' : currentLang === 'hi' ? 'वर्ग अ एवं ब' : 'Divisions A & B'}</div>
                   </div>
                 ))}
               </div>
@@ -105,61 +138,45 @@ export default function Sections() {
               <div className="bg-blue-50/50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-900 rounded-3xl p-6 space-y-4">
                 <h3 className="text-lg font-bold text-blue-900 dark:text-blue-200 flex items-center gap-2">
                   <GraduationCap className="w-5 h-5 text-blue-600" />
-                  <span>Class 11 & 12 Academic Streams & Combinations</span>
+                  <span>{t('sections.streams', 'Academic Streams & Specializations')}</span>
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  {section.streams.map(st => (
-                    <div key={st.id} className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-blue-200 dark:border-slate-800 shadow-sm space-y-2">
-                      <div className="font-bold text-sm text-blue-700 dark:text-blue-400">{st.nameEn}</div>
-                      <ul className="text-xs text-slate-600 dark:text-slate-400 space-y-1">
-                        {st.subjects.map((sub, idx) => (
-                          <li key={idx} className="flex items-center gap-1.5">
-                            <span className="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
-                            <span>{sub}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  ))}
+                  {section.streams.map(st => {
+                    const stName = currentLang === 'mr' ? (st.nameMr || st.nameEn) : currentLang === 'hi' ? (st.nameHi || st.nameEn) : st.nameEn;
+                    return (
+                      <div key={st.id} className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-blue-200 dark:border-slate-800 shadow-sm space-y-2">
+                        <div className="font-bold text-sm text-blue-700 dark:text-blue-400">{stName}</div>
+                        <ul className="text-xs text-slate-600 dark:text-slate-400 space-y-1">
+                          {st.subjects.map((sub, idx) => (
+                            <li key={idx} className="flex items-center gap-1.5">
+                              <span className="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
+                              <span>{sub}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             )}
 
-            {/* Primary Section Scholarship & Board Highlights */}
-            {section.scholarshipClasses && (
-              <div className="bg-emerald-50/50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-900 rounded-3xl p-6 space-y-4">
-                <h3 className="text-lg font-bold text-emerald-900 dark:text-emerald-200 flex items-center gap-2">
-                  <Award className="w-5 h-5 text-emerald-600" />
-                  <span>Class 5 & 8 Scholarship Exam & Class 10 SSC Desk</span>
-                </h3>
-                <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
-                  Special scholarship coaching modules are integrated into daily schedules for Class 5 and Class 8. Class 9 and 10 students receive pre-board examination practice, previous year question banks, and hall ticket desk support.
-                </p>
-              </div>
-            )}
-
-            {/* Primary Descriptive Grade System */}
-            {section.skills && (
-              <div className="bg-amber-50/50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900 rounded-3xl p-6 space-y-4">
-                <h3 className="text-lg font-bold text-amber-900 dark:text-amber-200 flex items-center gap-2">
-                  <Sparkles className="w-5 h-5 text-amber-600" />
-                  <span>Foundational Skill-Based Progress System</span>
-                </h3>
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                  {section.skills.map((sk, idx) => (
-                    <div key={idx} className="bg-white dark:bg-slate-900 p-3 rounded-2xl text-xs font-semibold text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-slate-800 text-center">
-                      {sk}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
+            {/* Assessment Details Card */}
+            <div className="bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 rounded-3xl p-6 space-y-3">
+              <h3 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                <Award className="w-5 h-5 text-amber-500" />
+                <span>{t('sections.assessment', 'Assessment Pattern')}</span>
+              </h3>
+              <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                {getAssessmentLabel()}
+              </p>
+            </div>
 
             {/* Subjects Offered */}
             <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-sm space-y-4">
               <h3 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
                 <BookOpen className="w-5 h-5 text-blue-600" />
-                <span>Curriculum & Subjects</span>
+                <span>{t('sections.curriculum', 'Curriculum & Subjects')}</span>
               </h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {section.subjects.map(sub => (
@@ -185,29 +202,44 @@ export default function Sections() {
               />
               <div>
                 <h4 className="font-bold text-slate-900 dark:text-white text-base">{section.sectionHead}</h4>
-                <p className="text-xs text-amber-600 dark:text-amber-400 font-semibold">{section.sectionHeadRole}</p>
+                <p className="text-xs text-amber-600 dark:text-amber-400 font-semibold">{roleName}</p>
               </div>
               <p className="text-xs text-slate-500">
-                Directly responsible for academic scheduling, teacher allocation, and parent queries for {section.schoolName}.
+                {currentLang === 'mr'
+                  ? `${schoolName} च्या शैक्षणिक वेळापत्रक व नियोजनाची थेट जबाबदारी.`
+                  : currentLang === 'hi'
+                  ? `${schoolName} के शैक्षणिक संचालन एवं प्रबंधन का कार्यभार।`
+                  : `Directly responsible for academic scheduling and student growth for ${schoolName}.`}
               </p>
             </div>
 
-            {/* Syllabus Download Box */}
+            {/* Apply & Download Box */}
             <div className="bg-slate-900 text-white rounded-3xl p-6 space-y-4 shadow-lg border border-slate-800">
               <h4 className="font-bold text-amber-400 text-sm flex items-center gap-2">
                 <Download className="w-4 h-4" />
-                <span>Download Syllabus & Timetable</span>
+                <span>{t('navbar.downloads', 'Downloads')} & {t('navbar.admissions', 'Admissions')}</span>
               </h4>
               <p className="text-xs text-slate-300 leading-relaxed">
-                Get official PDF curriculum handbook and daily timetables for {section.schoolName}.
+                {currentLang === 'mr'
+                  ? `या विभागात प्रवेशासाठी ऑनलाइन अर्ज करा किंवा अभ्यासक्रम पुस्तिका डाउनलोड करा.`
+                  : currentLang === 'hi'
+                  ? `इस विभाग में प्रवेश हेतु ऑनलाइन आवेदन करें अथवा पाठ्यक्रम पुस्तिका डाउनलोड करें।`
+                  : `Apply for online admission or download the official curriculum syllabus.`}
               </p>
-              <Link
-                to="/downloads"
-                className="w-full py-2.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-xl text-xs flex items-center justify-center gap-2 transition"
-              >
-                <span>Browse Download Section</span>
-                <Download className="w-3.5 h-3.5" />
-              </Link>
+              <div className="space-y-2">
+                <Link
+                  to="/admissions"
+                  className="w-full py-2.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-xl text-xs flex items-center justify-center gap-2 transition"
+                >
+                  <span>{t('sections.applyForSection', 'Apply for Admission')}</span>
+                </Link>
+                <Link
+                  to="/downloads"
+                  className="w-full py-2.5 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-xl text-xs flex items-center justify-center gap-2 transition border border-slate-700"
+                >
+                  <span>{t('navbar.downloads', 'Downloads')}</span>
+                </Link>
+              </div>
             </div>
 
           </div>

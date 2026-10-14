@@ -45,7 +45,7 @@ app.get('/api/public/home', (req, res) => {
     const notices = db.prepare(`SELECT * FROM notices ORDER BY created_at DESC LIMIT 6`).all();
     const events = db.prepare(`SELECT * FROM events ORDER BY event_date ASC LIMIT 4`).all();
     const albums = db.prepare(`SELECT * FROM gallery_albums ORDER BY date DESC LIMIT 4`).all();
-    
+
     // Top achievers mock data from database results
     const topAchievers = [
       { name: 'Rohit Patil', class: 'Class 12 (Science)', score: '96.4%', title: 'HSC College Topper', photo: 'https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&q=80&w=200' },
@@ -69,6 +69,39 @@ app.get('/api/public/home', (req, res) => {
   }
 });
 
+// Multilingual helper to localize a row based on optional lang parameter
+function localizeRow(row, lang) {
+  if (!row || !lang) return row;
+  const l = lang.startsWith('mr') ? 'mr' : lang.startsWith('hi') ? 'hi' : 'en';
+  const localized = { ...row };
+  if (l === 'mr') {
+    localized.title = row.title_mr || row.title_en || row.title || '';
+    localized.description = row.description_mr || row.description_en || row.description || '';
+    localized.content = row.content_mr || row.content_en || row.content || '';
+    localized.designation = row.designation_mr || row.designation_en || row.designation || '';
+    localized.department = row.department_mr || row.department_en || row.department || '';
+    localized.qualification = row.qualification_mr || row.qualification_en || row.qualification || '';
+    localized.tag = row.tag_mr || row.tag_en || row.tag || '';
+  } else if (l === 'hi') {
+    localized.title = row.title_hi || row.title_en || row.title || '';
+    localized.description = row.description_hi || row.description_en || row.description || '';
+    localized.content = row.content_hi || row.content_en || row.content || '';
+    localized.designation = row.designation_hi || row.designation_en || row.designation || '';
+    localized.department = row.department_hi || row.department_en || row.department || '';
+    localized.qualification = row.qualification_hi || row.qualification_en || row.qualification || '';
+    localized.tag = row.tag_hi || row.tag_en || row.tag || '';
+  } else {
+    localized.title = row.title_en || row.title || '';
+    localized.description = row.description_en || row.description || '';
+    localized.content = row.content_en || row.content || '';
+    localized.designation = row.designation_en || row.designation || '';
+    localized.department = row.department_en || row.department || '';
+    localized.qualification = row.qualification_en || row.qualification || '';
+    localized.tag = row.tag_en || row.tag || '';
+  }
+  return localized;
+}
+
 // Public Notices
 app.get('/api/public/notices', (req, res) => {
   try {
@@ -87,7 +120,8 @@ app.get('/api/public/notices', (req, res) => {
 
     query += ` ORDER BY is_important DESC, created_at DESC`;
     const notices = db.prepare(query).all(...params);
-    res.json({ success: true, data: notices });
+    const data = notices.map(n => localizeRow(n, req.query.lang));
+    res.json({ success: true, data });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
@@ -105,7 +139,8 @@ app.get('/api/public/events', (req, res) => {
     }
     query += ` ORDER BY event_date ASC`;
     const events = db.prepare(query).all(...params);
-    res.json({ success: true, data: events });
+    const data = events.map(e => localizeRow(e, req.query.lang));
+    res.json({ success: true, data });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
@@ -123,11 +158,22 @@ app.get('/api/public/gallery', (req, res) => {
     }
     query += ` ORDER BY date DESC`;
     const albums = db.prepare(query).all(...params);
-    
+
     // Fetch images for each album
     const result = albums.map(album => {
-      const images = db.prepare(`SELECT * FROM gallery_images WHERE album_id = ?`).all(album.id);
-      return { ...album, images };
+      const rawImages = db.prepare(`SELECT * FROM gallery_images WHERE album_id = ?`).all(album.id);
+      const images = rawImages.map(img => {
+        if (req.query.lang) {
+          const l = req.query.lang.startsWith('mr') ? 'mr' : req.query.lang.startsWith('hi') ? 'hi' : 'en';
+          const locImg = { ...img };
+          if (l === 'mr') locImg.caption = img.caption_mr || img.caption_en || img.caption || '';
+          else if (l === 'hi') locImg.caption = img.caption_hi || img.caption_en || img.caption || '';
+          else locImg.caption = img.caption_en || img.caption || '';
+          return locImg;
+        }
+        return img;
+      });
+      return { ...localizeRow(album, req.query.lang), images };
     });
 
     res.json({ success: true, data: result });
@@ -152,7 +198,8 @@ app.get('/api/public/staff', (req, res) => {
     }
     query += ` ORDER BY id ASC`;
     const staff = db.prepare(query).all(...params);
-    res.json({ success: true, data: staff });
+    const data = staff.map(s => localizeRow(s, req.query.lang));
+    res.json({ success: true, data });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
@@ -174,7 +221,38 @@ app.get('/api/public/downloads', (req, res) => {
     }
     query += ` ORDER BY updated_at DESC`;
     const items = db.prepare(query).all(...params);
-    res.json({ success: true, data: items });
+    const data = items.map(d => localizeRow(d, req.query.lang));
+    res.json({ success: true, data });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
+// Public Facilities
+app.get('/api/public/facilities', (req, res) => {
+  try {
+    const { section } = req.query;
+    let query = `SELECT * FROM facilities WHERE 1=1`;
+    let params = [];
+    if (section && section !== 'all') {
+      query += ` AND (section_id = ? OR section_id IS NULL)`;
+      params.push(section);
+    }
+    query += ` ORDER BY id ASC`;
+    const items = db.prepare(query).all(...params);
+    const data = items.map(f => localizeRow(f, req.query.lang));
+    res.json({ success: true, data });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
+// Public Schemes
+app.get('/api/public/schemes', (req, res) => {
+  try {
+    const items = db.prepare(`SELECT * FROM schemes ORDER BY id ASC`).all();
+    const data = items.map(s => localizeRow(s, req.query.lang));
+    res.json({ success: true, data });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
@@ -229,7 +307,7 @@ app.post('/api/public/results/lookup', (req, res) => {
     } else {
       // Primary & High School Marksheet
       const marks = db.prepare(`SELECT * FROM results WHERE student_id = ?`).all(student.id);
-      
+
       const totalMarksObtained = marks.reduce((acc, curr) => acc + curr.marks_obtained, 0);
       const totalMaxMarks = marks.reduce((acc, curr) => acc + curr.max_marks, 0);
       const percentage = totalMaxMarks > 0 ? ((totalMarksObtained / totalMaxMarks) * 100).toFixed(2) : 0;
@@ -326,7 +404,7 @@ app.post('/api/auth/login', (req, res) => {
     }
 
     const token = generateToken(user);
-    
+
     // Fetch associated entity detail (student or teacher if applicable)
     let profileData = null;
     if (user.role === 'student_parent') {
@@ -369,7 +447,7 @@ app.get('/api/auth/me', authenticateToken, (req, res) => {
 app.get('/api/admin/dashboard/stats', authenticateToken, authorizeRoles('admin', 'teacher'), (req, res) => {
   try {
     const { section_id } = req.query;
-    
+
     let studentCountQuery = `SELECT COUNT(*) as count FROM students`;
     let teacherCountQuery = `SELECT COUNT(*) as count FROM teachers`;
     let noticeCountQuery = `SELECT COUNT(*) as count FROM notices`;
@@ -544,19 +622,21 @@ app.get('/api/admin/notices', authenticateToken, authorizeRoles('admin', 'teache
 
 app.post('/api/admin/notices', authenticateToken, authorizeRoles('admin', 'teacher'), upload.single('attachment'), (req, res) => {
   try {
-    const { title, content, title_en, title_mr, content_en, content_mr, category, section_id, class_number, is_important } = req.body;
+    const { title, content, title_en, title_mr, title_hi, content_en, content_mr, content_hi, category, section_id, class_number, is_important } = req.body;
     const attachment_url = req.file ? `/uploads/${req.file.filename}` : null;
 
     const finalTitleEn = title_en || title || '';
-    const finalTitleMr = title_mr || title || finalTitleEn;
+    const finalTitleMr = title_mr || finalTitleEn;
+    const finalTitleHi = title_hi || finalTitleEn;
     const finalContentEn = content_en || content || '';
-    const finalContentMr = content_mr || content || finalContentEn;
+    const finalContentMr = content_mr || finalContentEn;
+    const finalContentHi = content_hi || finalContentEn;
 
     const result = db.prepare(`
-      INSERT INTO notices (title, content, title_en, title_mr, content_en, content_mr, category, attachment_url, section_id, class_number, is_important)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      INSERT INTO notices (title, content, title_en, title_mr, title_hi, content_en, content_mr, content_hi, category, attachment_url, section_id, class_number, is_important)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `).run(
-      finalTitleEn, finalContentEn, finalTitleEn, finalTitleMr, finalContentEn, finalContentMr,
+      finalTitleEn, finalContentEn, finalTitleEn, finalTitleMr, finalTitleHi, finalContentEn, finalContentMr, finalContentHi,
       category || 'general', attachment_url,
       !section_id || section_id === 'all' ? null : section_id,
       class_number ? parseInt(class_number, 10) : null,
@@ -572,7 +652,7 @@ app.post('/api/admin/notices', authenticateToken, authorizeRoles('admin', 'teach
 app.put('/api/admin/notices/:id', authenticateToken, authorizeRoles('admin'), upload.single('attachment'), (req, res) => {
   try {
     const { id } = req.params;
-    const { title_en, title_mr, content_en, content_mr, category, section_id, is_important } = req.body;
+    const { title_en, title_mr, title_hi, content_en, content_mr, content_hi, category, section_id, is_important } = req.body;
     const existing = db.prepare(`SELECT * FROM notices WHERE id = ?`).get(id);
 
     if (!existing) {
@@ -581,16 +661,18 @@ app.put('/api/admin/notices/:id', authenticateToken, authorizeRoles('admin'), up
 
     const attachment_url = req.file ? `/uploads/${req.file.filename}` : existing.attachment_url;
     const finalTitleEn = title_en || existing.title_en;
-    const finalTitleMr = title_mr || existing.title_mr;
+    const finalTitleMr = title_mr || existing.title_mr || finalTitleEn;
+    const finalTitleHi = title_hi || existing.title_hi || finalTitleEn;
     const finalContentEn = content_en || existing.content_en;
-    const finalContentMr = content_mr || existing.content_mr;
+    const finalContentMr = content_mr || existing.content_mr || finalContentEn;
+    const finalContentHi = content_hi || existing.content_hi || finalContentEn;
 
     db.prepare(`
       UPDATE notices 
-      SET title = ?, content = ?, title_en = ?, title_mr = ?, content_en = ?, content_mr = ?, category = ?, attachment_url = ?, section_id = ?, is_important = ?
+      SET title = ?, content = ?, title_en = ?, title_mr = ?, title_hi = ?, content_en = ?, content_mr = ?, content_hi = ?, category = ?, attachment_url = ?, section_id = ?, is_important = ?
       WHERE id = ?
     `).run(
-      finalTitleEn, finalContentEn, finalTitleEn, finalTitleMr, finalContentEn, finalContentMr,
+      finalTitleEn, finalContentEn, finalTitleEn, finalTitleMr, finalTitleHi, finalContentEn, finalContentMr, finalContentHi,
       category || existing.category, attachment_url,
       !section_id || section_id === 'all' ? null : section_id,
       is_important === 'true' || is_important === true || is_important === 1 ? 1 : 0,
@@ -708,7 +790,7 @@ app.get('/api/teacher/dashboard', authenticateToken, authorizeRoles('teacher'), 
     }
 
     const assignments = db.prepare(`SELECT * FROM teacher_assignments WHERE teacher_id = ?`).all(teacher.id);
-    
+
     // Assigned students in teacher's section
     const students = db.prepare(`
       SELECT * FROM students WHERE section_id = ? ORDER BY class_number ASC, roll_number ASC

@@ -1,19 +1,32 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import axios from 'axios';
 import StatCard from '../../components/ui/StatCard';
 import DataTable from '../../components/ui/DataTable';
 import Modal from '../../components/common/Modal';
-import { getSectionById } from '@shared/sections.config';
-import { Users, GraduationCap, Bell, Plus, CheckCircle, Calendar, BookOpen, Clock, FileText, AlertCircle } from 'lucide-react';
+import { getSectionById, getSectionName } from '@shared/sections.config';
+import { Users, GraduationCap, Bell, Plus, BookOpen, AlertCircle } from 'lucide-react';
+import { formatLocalizedDate, getLocalizedText } from '../../utils/bilingual';
 
 export default function TeacherDashboard({ user }) {
+  const { t, i18n } = useTranslation(['dashboard', 'common']);
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   // Modal states
   const [noticeModalOpen, setNoticeModalOpen] = useState(false);
-  const [noticeForm, setNoticeForm] = useState({ title_en: '', title_mr: '', content_en: '', content_mr: '', category: 'general', is_important: false });
+  const [noticeLangTab, setNoticeLangTab] = useState('en');
+  const [noticeForm, setNoticeForm] = useState({
+    title_en: '',
+    title_mr: '',
+    title_hi: '',
+    content_en: '',
+    content_mr: '',
+    content_hi: '',
+    category: 'general',
+    is_important: false
+  });
 
   const [marksModalOpen, setMarksModalOpen] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState(null);
@@ -29,15 +42,15 @@ export default function TeacherDashboard({ user }) {
     teacher_remarks: ''
   });
 
-  const [activeTab, setActiveTab] = useState('students'); // 'students' | 'timetable' | 'notices'
+  const [activeTab, setActiveTab] = useState('students'); // 'students' | 'notices'
 
   useEffect(() => {
     fetchTeacherData();
-  }, []);
+  }, [i18n.language]);
 
   const fetchTeacherData = () => {
     setLoading(true);
-    axios.get('/api/teacher/dashboard')
+    axios.get(`/api/teacher/dashboard?lang=${i18n.language}`)
       .then(res => {
         if (res.data.success) {
           setData(res.data.data);
@@ -55,13 +68,22 @@ export default function TeacherDashboard({ user }) {
     e.preventDefault();
     axios.post('/api/admin/notices', {
       ...noticeForm,
-      title: noticeForm.title_en || noticeForm.title_mr,
-      content: noticeForm.content_en || noticeForm.content_mr,
+      title: noticeForm.title_en || noticeForm.title_mr || noticeForm.title_hi,
+      content: noticeForm.content_en || noticeForm.content_mr || noticeForm.content_hi,
       section_id: data?.teacher?.section_id
     }).then(res => {
       if (res.data.success) {
         setNoticeModalOpen(false);
-        setNoticeForm({ title_en: '', title_mr: '', content_en: '', content_mr: '', category: 'general', is_important: false });
+        setNoticeForm({
+          title_en: '',
+          title_mr: '',
+          title_hi: '',
+          content_en: '',
+          content_mr: '',
+          content_hi: '',
+          category: 'general',
+          is_important: false
+        });
         fetchTeacherData();
       }
     });
@@ -79,7 +101,7 @@ export default function TeacherDashboard({ user }) {
       }).then(res => {
         if (res.data.success) {
           setMarksModalOpen(false);
-          alert('Progress Report Card saved successfully!');
+          alert(i18n.language === 'mr' ? 'प्रगती पुस्तक यशस्वीपणे जतन केले!' : i18n.language === 'hi' ? 'प्रगति पत्र सफलतापूर्वक सुरक्षित किया गया!' : 'Progress Report Card saved successfully!');
         }
       }).catch(err => alert(err.response?.data?.message || 'Failed to save progress report.'));
     } else {
@@ -89,7 +111,7 @@ export default function TeacherDashboard({ user }) {
       }).then(res => {
         if (res.data.success) {
           setMarksModalOpen(false);
-          alert('Academic marks recorded successfully!');
+          alert(i18n.language === 'mr' ? 'गुण यशस्वीरित्या नोंदवले गेले!' : i18n.language === 'hi' ? 'अंक सफलतापूर्वक दर्ज किए गए!' : 'Academic marks recorded successfully!');
         }
       }).catch(err => alert(err.response?.data?.message || 'Failed to save marks.'));
     }
@@ -98,7 +120,7 @@ export default function TeacherDashboard({ user }) {
   if (loading) {
     return (
       <div className="py-20 text-center text-slate-500 animate-pulse">
-        Loading Teacher Workspace...
+        {t('common.loading')}
       </div>
     );
   }
@@ -119,19 +141,18 @@ export default function TeacherDashboard({ user }) {
   const notices = data?.notices || [];
 
   const studentColumns = [
-    { header: 'GR No', accessor: 'gr_number', render: (r) => <span className="font-mono font-bold">{r.gr_number}</span> },
-    { header: 'Roll', accessor: 'roll_number' },
-    { header: 'Student Name', render: (r) => <span className="font-semibold text-slate-900 dark:text-white">{r.first_name} {r.last_name}</span> },
-    { header: 'Class & Div', render: (r) => `Class ${r.class_number} (${r.division_name})` },
-    { header: 'Gender', accessor: 'gender' },
-    { header: 'Parent Contact', accessor: 'phone' },
+    { header: t('dashboard.grNo'), accessor: 'gr_number', render: (r) => <span className="font-mono font-bold">{r.gr_number}</span> },
+    { header: t('dashboard.rollNo'), accessor: 'roll_number' },
+    { header: t('dashboard.studentName'), render: (r) => <span className="font-semibold text-slate-900 dark:text-white">{r.first_name} {r.last_name}</span> },
+    { header: t('dashboard.classDivision'), render: (r) => `Class ${r.class_number} (${r.division_name})` },
+    { header: t('dashboard.gender'), accessor: 'gender' },
+    { header: t('dashboard.parentContact'), accessor: 'phone' },
     {
-      header: 'Marks Action',
+      header: t('dashboard.actions'),
       render: (r) => (
         <button
           onClick={() => {
             setSelectedStudent(r);
-            // Default subject from teacher assignment if available
             if (assignments.length > 0) {
               setMarksForm(prev => ({
                 ...prev,
@@ -144,7 +165,7 @@ export default function TeacherDashboard({ user }) {
           className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl shadow transition flex items-center gap-1"
         >
           <BookOpen className="w-3.5 h-3.5" />
-          <span>{section?.assessmentType === 'grade-based' ? 'Enter Report Card' : 'Enter Marks'}</span>
+          <span>{section?.assessmentType === 'grade-based' ? t('dashboard.primarySectionCount') : t('dashboard.enterMarks')}</span>
         </button>
       )
     }
@@ -164,12 +185,14 @@ export default function TeacherDashboard({ user }) {
           <div>
             <div className="flex items-center gap-2">
               <span className="text-xs bg-emerald-500/20 text-emerald-300 font-bold px-2.5 py-0.5 rounded-full border border-emerald-400/30">
-                Teacher Dashboard
+                {t('dashboard.teacherDashboard')}
               </span>
-              <span className="text-xs text-slate-400">• Employee ID: {teacher?.employee_id}</span>
+              <span className="text-xs text-slate-400">• ID: {teacher?.employee_id}</span>
             </div>
             <h1 className="text-2xl font-extrabold text-white mt-1">{teacher?.full_name}</h1>
-            <p className="text-xs text-slate-300">{teacher?.designation} • {teacher?.department}</p>
+            <p className="text-xs text-slate-300">
+              {getLocalizedText(teacher, 'designation', i18n.language) || teacher?.designation} • {teacher?.department}
+            </p>
           </div>
         </div>
 
@@ -179,16 +202,16 @@ export default function TeacherDashboard({ user }) {
             className="px-4 py-2.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-xl text-xs flex items-center gap-2 shadow"
           >
             <Plus className="w-4 h-4" />
-            <span>Publish Circular</span>
+            <span>{t('dashboard.publishNotice')}</span>
           </button>
         </div>
       </div>
 
       {/* Stats row */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-        <StatCard title="Assigned Section" value={section?.nameEn || 'Primary'} icon={GraduationCap} color="emerald" subtitle={section?.shortName} />
-        <StatCard title="Enrolled Students" value={students.length} icon={Users} color="blue" subtitle="Students in assigned section" />
-        <StatCard title="Assigned Subjects" value={assignments.length || 2} icon={BookOpen} color="amber" subtitle="Active academic loads" />
+        <StatCard title={t('dashboard.section')} value={getSectionName(section, i18n.language) || 'Primary'} icon={GraduationCap} color="emerald" subtitle={section?.shortName} />
+        <StatCard title={t('dashboard.totalStudents')} value={students.length} icon={Users} color="blue" subtitle={t('dashboard.studentRecords')} />
+        <StatCard title={t('dashboard.subject')} value={assignments.length || 2} icon={BookOpen} color="amber" subtitle="Active teaching assignments" />
       </div>
 
       {/* Navigation Tabs */}
@@ -202,7 +225,7 @@ export default function TeacherDashboard({ user }) {
           }`}
         >
           <Users className="w-4 h-4" />
-          <span>Assigned Class Students & Marks Entry</span>
+          <span>{t('dashboard.assignedClassStudents')}</span>
         </button>
 
         <button
@@ -214,7 +237,7 @@ export default function TeacherDashboard({ user }) {
           }`}
         >
           <Bell className="w-4 h-4" />
-          <span>Section Notices & Circulars</span>
+          <span>{t('dashboard.tabNotices')}</span>
         </button>
       </div>
 
@@ -223,17 +246,14 @@ export default function TeacherDashboard({ user }) {
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <h3 className="text-lg font-bold text-slate-900 dark:text-white">
-              Students Roster ({section?.nameEn})
+              {t('dashboard.studentRecords')} ({getSectionName(section, i18n.language)})
             </h3>
-            <span className="text-xs text-slate-500">
-              Only authorized to enter marks for students in your assigned section ({section?.nameEn}).
-            </span>
           </div>
 
           <DataTable
             columns={studentColumns}
             data={students}
-            searchPlaceholder="Search assigned student by name or GR number..."
+            searchPlaceholder={t('common.search')}
           />
         </div>
       )}
@@ -242,13 +262,13 @@ export default function TeacherDashboard({ user }) {
       {activeTab === 'notices' && (
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <h3 className="text-lg font-bold text-slate-900 dark:text-white">Published Notices</h3>
+            <h3 className="text-lg font-bold text-slate-900 dark:text-white">{t('dashboard.manageNotices')}</h3>
             <button
               onClick={() => setNoticeModalOpen(true)}
               className="px-3 py-1.5 bg-emerald-600 text-white font-bold text-xs rounded-xl flex items-center gap-1 shadow"
             >
               <Plus className="w-3.5 h-3.5" />
-              <span>New Notice</span>
+              <span>{t('dashboard.publishNotice')}</span>
             </button>
           </div>
 
@@ -259,10 +279,10 @@ export default function TeacherDashboard({ user }) {
                   <span className="bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300 font-bold px-2 py-0.5 rounded-full uppercase text-[10px]">
                     {notice.category}
                   </span>
-                  <span className="text-slate-400">{notice.created_at?.split('T')[0] || notice.created_at}</span>
+                  <span className="text-slate-400">{formatLocalizedDate(notice.created_at, i18n.language)}</span>
                 </div>
-                <h4 className="font-bold text-sm text-slate-900 dark:text-white">{notice.title_en || notice.title}</h4>
-                <p className="text-xs text-slate-600 dark:text-slate-300">{notice.content_en || notice.content}</p>
+                <h4 className="font-bold text-sm text-slate-900 dark:text-white">{getLocalizedText(notice, 'title', i18n.language)}</h4>
+                <p className="text-xs text-slate-600 dark:text-slate-300">{getLocalizedText(notice, 'content', i18n.language)}</p>
               </div>
             ))}
           </div>
@@ -270,54 +290,130 @@ export default function TeacherDashboard({ user }) {
       )}
 
       {/* Publish Notice Modal */}
-      <Modal isOpen={noticeModalOpen} onClose={() => setNoticeModalOpen(false)} title="Publish Circular for Assigned Section">
+      <Modal isOpen={noticeModalOpen} onClose={() => setNoticeModalOpen(false)} title={t('dashboard.publishNotice')}>
         <form onSubmit={handleNoticeSubmit} className="space-y-4 text-xs">
-          <div>
-            <label className="block font-semibold mb-1">Notice Title (English) *</label>
-            <input
-              type="text"
-              required
-              placeholder="Notice title in English..."
-              value={noticeForm.title_en}
-              onChange={(e) => setNoticeForm({ ...noticeForm, title_en: e.target.value })}
-              className="w-full p-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl"
-            />
+          
+          {/* Language Selection Tabs */}
+          <div className="flex border-b border-slate-200 dark:border-slate-700 gap-2 pb-2">
+            <button
+              type="button"
+              onClick={() => setNoticeLangTab('en')}
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1 ${
+                noticeLangTab === 'en'
+                  ? 'bg-slate-900 text-amber-400 shadow'
+                  : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300'
+              }`}
+            >
+              <span>{t('dashboard.tabEnglish')}</span>
+              <span className="text-[10px] text-amber-400 font-normal">({i18n.language === 'mr' ? 'आवश्यक' : 'Required'})</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setNoticeLangTab('mr')}
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1 ${
+                noticeLangTab === 'mr'
+                  ? 'bg-slate-900 text-amber-400 shadow'
+                  : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300'
+              }`}
+            >
+              <span>{t('dashboard.tabMarathi')}</span>
+              <span className="text-[10px] text-slate-400 font-normal">({i18n.language === 'mr' ? 'ऐच्छिक' : 'Optional'})</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setNoticeLangTab('hi')}
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1 ${
+                noticeLangTab === 'hi'
+                  ? 'bg-slate-900 text-amber-400 shadow'
+                  : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300'
+              }`}
+            >
+              <span>{t('dashboard.tabHindi')}</span>
+              <span className="text-[10px] text-slate-400 font-normal">({i18n.language === 'mr' ? 'ऐच्छिक' : 'Optional'})</span>
+            </button>
           </div>
-          <div>
-            <label className="block font-semibold mb-1">Notice Title (Marathi / मराठी) *</label>
-            <input
-              type="text"
-              required
-              placeholder="मराठीत शीर्षक..."
-              value={noticeForm.title_mr}
-              onChange={(e) => setNoticeForm({ ...noticeForm, title_mr: e.target.value })}
-              className="w-full p-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl font-devanagari"
-            />
-          </div>
-          <div>
-            <label className="block font-semibold mb-1">Notice Content (English) *</label>
-            <textarea
-              rows="3"
-              required
-              placeholder="Detailed instructions..."
-              value={noticeForm.content_en}
-              onChange={(e) => setNoticeForm({ ...noticeForm, content_en: e.target.value })}
-              className="w-full p-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl"
-            ></textarea>
-          </div>
-          <div>
-            <label className="block font-semibold mb-1">Notice Content (Marathi / मराठी) *</label>
-            <textarea
-              rows="3"
-              required
-              placeholder="मराठीत सविस्तर मजकूर..."
-              value={noticeForm.content_mr}
-              onChange={(e) => setNoticeForm({ ...noticeForm, content_mr: e.target.value })}
-              className="w-full p-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl font-devanagari"
-            ></textarea>
-          </div>
+
+          {noticeLangTab === 'en' && (
+            <div className="space-y-3">
+              <div>
+                <label className="block font-semibold mb-1">{t('dashboard.fieldTitleEn')}</label>
+                <input
+                  type="text"
+                  required
+                  placeholder={t('dashboard.noticeTitlePlaceholderEn', 'Notice title in English...')}
+                  value={noticeForm.title_en}
+                  onChange={(e) => setNoticeForm({ ...noticeForm, title_en: e.target.value })}
+                  className="w-full p-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl"
+                />
+              </div>
+              <div>
+                <label className="block font-semibold mb-1">{t('dashboard.fieldDescEn')}</label>
+                <textarea
+                  rows="3"
+                  required
+                  placeholder={t('dashboard.noticeContentPlaceholderEn', 'Detailed instructions in English...')}
+                  value={noticeForm.content_en}
+                  onChange={(e) => setNoticeForm({ ...noticeForm, content_en: e.target.value })}
+                  className="w-full p-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl"
+                ></textarea>
+              </div>
+            </div>
+          )}
+
+          {noticeLangTab === 'mr' && (
+            <div className="space-y-3">
+              <div>
+                <label className="block font-semibold mb-1">{t('dashboard.fieldTitleMr')}</label>
+                <input
+                  type="text"
+                  placeholder={t('dashboard.noticeTitlePlaceholderMr', 'मराठीत शीर्षक...')}
+                  value={noticeForm.title_mr}
+                  onChange={(e) => setNoticeForm({ ...noticeForm, title_mr: e.target.value })}
+                  className="w-full p-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl font-devanagari"
+                />
+              </div>
+              <div>
+                <label className="block font-semibold mb-1">{t('dashboard.fieldDescMr')}</label>
+                <textarea
+                  rows="3"
+                  placeholder={t('dashboard.noticeContentPlaceholderMr', 'मराठीत सविस्तर मजकूर...')}
+                  value={noticeForm.content_mr}
+                  onChange={(e) => setNoticeForm({ ...noticeForm, content_mr: e.target.value })}
+                  className="w-full p-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl font-devanagari"
+                ></textarea>
+              </div>
+            </div>
+          )}
+
+          {noticeLangTab === 'hi' && (
+            <div className="space-y-3">
+              <div>
+                <label className="block font-semibold mb-1">{t('dashboard.fieldTitleHi')}</label>
+                <input
+                  type="text"
+                  placeholder={t('dashboard.noticeTitlePlaceholderHi', 'हिंदी में शीर्षक...')}
+                  value={noticeForm.title_hi}
+                  onChange={(e) => setNoticeForm({ ...noticeForm, title_hi: e.target.value })}
+                  className="w-full p-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl"
+                />
+              </div>
+              <div>
+                <label className="block font-semibold mb-1">{t('dashboard.fieldDescHi')}</label>
+                <textarea
+                  rows="3"
+                  placeholder={t('dashboard.noticeContentPlaceholderHi', 'हिंदी में विस्तृत जानकारी...')}
+                  value={noticeForm.content_hi}
+                  onChange={(e) => setNoticeForm({ ...noticeForm, content_hi: e.target.value })}
+                  className="w-full p-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl"
+                ></textarea>
+              </div>
+            </div>
+          )}
+
           <button type="submit" className="w-full py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl text-xs shadow">
-            Post Circular
+            {t('dashboard.publishNotice')}
           </button>
         </form>
       </Modal>
@@ -326,59 +422,59 @@ export default function TeacherDashboard({ user }) {
       <Modal
         isOpen={marksModalOpen}
         onClose={() => setMarksModalOpen(false)}
-        title={section?.assessmentType === 'grade-based' ? `Enter Descriptive Progress Card: ${selectedStudent?.first_name} ${selectedStudent?.last_name}` : `Enter Academic Marks: ${selectedStudent?.first_name} ${selectedStudent?.last_name}`}
+        title={section?.assessmentType === 'grade-based' ? `${t('dashboard.primarySectionCount')}: ${selectedStudent?.first_name} ${selectedStudent?.last_name}` : `${t('dashboard.marksEntryModalTitle')}: ${selectedStudent?.first_name} ${selectedStudent?.last_name}`}
       >
         <form onSubmit={handleSaveMarks} className="space-y-4 text-xs">
           {section?.assessmentType === 'grade-based' ? (
             <div className="space-y-3">
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block font-semibold mb-1">Reading Grade</label>
+                  <label className="block font-semibold mb-1">{t('results.readingGrade', 'Reading Skill Grade')}</label>
                   <input type="text" value={progressReportForm.reading_grade} onChange={e => setProgressReportForm({...progressReportForm, reading_grade: e.target.value})} className="w-full p-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl" />
                 </div>
                 <div>
-                  <label className="block font-semibold mb-1">Writing Grade</label>
+                  <label className="block font-semibold mb-1">{t('results.writingGrade', 'Writing Skill Grade')}</label>
                   <input type="text" value={progressReportForm.writing_grade} onChange={e => setProgressReportForm({...progressReportForm, writing_grade: e.target.value})} className="w-full p-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl" />
                 </div>
                 <div>
-                  <label className="block font-semibold mb-1">Numeracy Grade</label>
+                  <label className="block font-semibold mb-1">{t('results.numeracyGrade', 'Numeracy Skill Grade')}</label>
                   <input type="text" value={progressReportForm.numeracy_grade} onChange={e => setProgressReportForm({...progressReportForm, numeracy_grade: e.target.value})} className="w-full p-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl" />
                 </div>
                 <div>
-                  <label className="block font-semibold mb-1">Art & Craft Grade</label>
+                  <label className="block font-semibold mb-1">{t('results.artGrade', 'Art & Craft Grade')}</label>
                   <input type="text" value={progressReportForm.art_grade} onChange={e => setProgressReportForm({...progressReportForm, art_grade: e.target.value})} className="w-full p-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl" />
                 </div>
               </div>
               <div>
-                <label className="block font-semibold mb-1">Teacher Remarks</label>
+                <label className="block font-semibold mb-1">{t('results.teacherOverallRemarks', "Teacher's Overall Remarks")}</label>
                 <textarea rows="3" value={progressReportForm.teacher_remarks} onChange={e => setProgressReportForm({...progressReportForm, teacher_remarks: e.target.value})} className="w-full p-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl"></textarea>
               </div>
             </div>
           ) : (
             <div className="space-y-3">
               <div>
-                <label className="block font-semibold mb-1">Subject Name</label>
+                <label className="block font-semibold mb-1">{t('dashboard.subject')}</label>
                 <input type="text" required value={marksForm.subject_name} onChange={e => setMarksForm({...marksForm, subject_name: e.target.value})} className="w-full p-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl" placeholder="e.g. Mathematics" />
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block font-semibold mb-1">Marks Obtained</label>
+                  <label className="block font-semibold mb-1">{t('dashboard.marksObtained')}</label>
                   <input type="number" required value={marksForm.marks_obtained} onChange={e => setMarksForm({...marksForm, marks_obtained: parseFloat(e.target.value)})} className="w-full p-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl" />
                 </div>
                 <div>
-                  <label className="block font-semibold mb-1">Max Marks</label>
+                  <label className="block font-semibold mb-1">{t('dashboard.maxMarks')}</label>
                   <input type="number" required value={marksForm.max_marks} onChange={e => setMarksForm({...marksForm, max_marks: parseFloat(e.target.value)})} className="w-full p-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl" />
                 </div>
               </div>
               <div>
-                <label className="block font-semibold mb-1">Remarks</label>
-                <input type="text" value={marksForm.remarks} onChange={e => setMarksForm({...marksForm, remarks: e.target.value})} className="w-full p-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl" placeholder="Optional comments..." />
+                <label className="block font-semibold mb-1">{t('dashboard.gradeRemarks')}</label>
+                <input type="text" value={marksForm.remarks} onChange={e => setMarksForm({...marksForm, remarks: e.target.value})} className="w-full p-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl" placeholder="Remarks..." />
               </div>
             </div>
           )}
 
           <button type="submit" className="w-full py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl text-xs shadow">
-            Submit Academic Record
+            {t('dashboard.saveMarks')}
           </button>
         </form>
       </Modal>
@@ -386,3 +482,4 @@ export default function TeacherDashboard({ user }) {
     </div>
   );
 }
+

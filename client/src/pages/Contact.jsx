@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import axios from 'axios';
 import PageHeader from '../components/common/PageHeader';
 import schoolConfig from '@shared/school.config';
 import { MapPin, Phone, Mail, Clock, Send, CheckCircle2, AlertCircle } from 'lucide-react';
 
 export default function Contact() {
+  const { t } = useTranslation(['contact', 'common']);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -26,7 +28,7 @@ export default function Contact() {
     try {
       const res = await axios.post('/api/public/enquiry', formData);
       if (res.data.success) {
-        setSuccessMsg(res.data.message);
+        setSuccessMsg(t('contact.successMsg'));
         setFormData({ name: '', email: '', phone: '', subject: '', message: '' });
       } else {
         setErrorMsg(res.data.message);
@@ -41,10 +43,9 @@ export default function Contact() {
   return (
     <div className="space-y-12 pb-16">
       <PageHeader
-        title="Contact School Office"
-        titleMr="शाळा कार्यालय संपर्क"
-        subtitle="Get in touch with school administration for admissions, document verification, and general inquiries."
-        badgeText="Get In Touch"
+        title={t('contact.pageTitle')}
+        subtitle={t('contact.pageSubtitle')}
+        badgeText={t('contact.badge')}
       />
 
       <div className="max-w-7xl mx-auto px-4 grid grid-cols-1 lg:grid-cols-12 gap-8">
@@ -53,7 +54,7 @@ export default function Contact() {
         <div className="lg:col-span-5 space-y-6">
 
           <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-sm space-y-4">
-            <h3 className="text-lg font-bold text-slate-900 dark:text-white">School Office Information</h3>
+            <h3 className="text-lg font-bold text-slate-900 dark:text-white">{t('contact.officeInfoTitle')}</h3>
 
             <div className="space-y-4 text-xs text-slate-600 dark:text-slate-300">
               <div className="flex items-start gap-3">
@@ -61,7 +62,7 @@ export default function Contact() {
                   <MapPin className="w-5 h-5" />
                 </div>
                 <div>
-                  <strong className="block text-slate-900 dark:text-white font-semibold mb-0.5">School Address:</strong>
+                  <strong className="block text-slate-900 dark:text-white font-semibold mb-0.5">{t('contact.addressLabel')}:</strong>
                   <span>{schoolConfig.contact.address}</span>
                 </div>
               </div>
@@ -71,7 +72,7 @@ export default function Contact() {
                   <Phone className="w-5 h-5" />
                 </div>
                 <div>
-                  <strong className="block text-slate-900 dark:text-white font-semibold mb-0.5">Phone Helpline:</strong>
+                  <strong className="block text-slate-900 dark:text-white font-semibold mb-0.5">{t('contact.phoneLabel')}:</strong>
                   <span>{schoolConfig.contact.phone} / {schoolConfig.contact.altPhone}</span>
                 </div>
               </div>
@@ -81,7 +82,7 @@ export default function Contact() {
                   <Mail className="w-5 h-5" />
                 </div>
                 <div>
-                  <strong className="block text-slate-900 dark:text-white font-semibold mb-0.5">Official Email:</strong>
+                  <strong className="block text-slate-900 dark:text-white font-semibold mb-0.5">{t('contact.emailLabel')}:</strong>
                   <span>{schoolConfig.contact.email}</span>
                 </div>
               </div>
@@ -91,7 +92,7 @@ export default function Contact() {
                   <Clock className="w-5 h-5" />
                 </div>
                 <div>
-                  <strong className="block text-slate-900 dark:text-white font-semibold mb-0.5">Visiting Office Hours:</strong>
+                  <strong className="block text-slate-900 dark:text-white font-semibold mb-0.5">{t('contact.hoursLabel')}:</strong>
                   <span>{schoolConfig.contact.officeHours}</span>
                 </div>
               </div>
@@ -101,7 +102,7 @@ export default function Contact() {
           {/* Google Map Embed */}
           <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl overflow-hidden shadow-sm h-64">
             <iframe
-              title="School Google Map Location"
+              title={t('contact.locationTitle')}
               src={schoolConfig.contact.googleMapsEmbedUrl}
               width="100%"
               height="100%"
@@ -119,9 +120,9 @@ export default function Contact() {
 
             <div className="mb-6">
               <h3 className="text-xl font-extrabold text-slate-900 dark:text-white">
-                Send an Online Inquiry
+                {t('contact.sendMsgTitle')}
               </h3>
-              <p className="text-xs text-slate-500">Our office staff will respond to your message promptly during office working hours.</p>
+              <p className="text-xs text-slate-500">{t('contact.sendMsgSubtitle')}</p>
             </div>
 
             {successMsg && (
@@ -141,11 +142,11 @@ export default function Contact() {
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Your Name *</label>
+                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">{t('contact.senderName')} *</label>
                   <input
                     type="text"
                     required
-                    placeholder="e.g. Rahul Gawande"
+                    placeholder={t('contact.senderNamePlaceholder')}
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                     className="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white"
@@ -153,11 +154,11 @@ export default function Contact() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Phone Number *</label>
+                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">{t('contact.senderPhone')} *</label>
                   <input
                     type="tel"
                     required
-                    placeholder="+91 9876543210"
+                    placeholder={t('contact.senderPhonePlaceholder')}
                     value={formData.phone}
                     onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                     className="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white"
@@ -167,11 +168,11 @@ export default function Contact() {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Email Address *</label>
+                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">{t('contact.senderEmail')} *</label>
                   <input
                     type="email"
                     required
-                    placeholder="name@gmail.com"
+                    placeholder={t('contact.senderEmailPlaceholder')}
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                     className="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white"
@@ -179,10 +180,10 @@ export default function Contact() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Subject</label>
+                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">{t('contact.subject')}</label>
                   <input
                     type="text"
-                    placeholder="e.g. Admission Query / TC Request"
+                    placeholder={t('contact.subjectPlaceholder')}
                     value={formData.subject}
                     onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
                     className="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white"
@@ -191,11 +192,11 @@ export default function Contact() {
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Your Message *</label>
+                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">{t('contact.message')} *</label>
                 <textarea
                   rows="4"
                   required
-                  placeholder="Type your message or inquiry details here..."
+                  placeholder={t('contact.messagePlaceholder')}
                   value={formData.message}
                   onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                   className="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white"
@@ -208,7 +209,7 @@ export default function Contact() {
                 className="w-full py-3.5 bg-slate-900 hover:bg-slate-800 text-amber-400 font-bold rounded-xl text-sm shadow-md transition flex items-center justify-center gap-2 disabled:opacity-50"
               >
                 <Send className="w-4 h-4" />
-                <span>{submitting ? 'Sending Message...' : 'Send Inquiry Message'}</span>
+                <span>{submitting ? t('contact.sendingBtn') : t('contact.sendBtn')}</span>
               </button>
             </form>
           </div>
@@ -218,3 +219,4 @@ export default function Contact() {
     </div>
   );
 }
+

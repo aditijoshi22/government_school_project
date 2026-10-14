@@ -1,6 +1,12 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
-export default function PageHeader({ title, titleMr, subtitle, themeColor = "#1E3A8A", badgeText }) {
+export default function PageHeader({ title, titleMr, titleHi, subtitle, themeColor = "#1E3A8A", badgeText }) {
+  const { i18n } = useTranslation();
+  const currentLang = i18n.language?.startsWith('mr') ? 'mr' : i18n.language?.startsWith('hi') ? 'hi' : 'en';
+
+  const secondaryTitle = currentLang === 'mr' ? titleMr : currentLang === 'hi' ? (titleHi || titleMr) : (titleMr || titleHi);
+
   return (
     <div 
       className="relative py-12 px-4 text-white overflow-hidden shadow-md"
@@ -18,9 +24,9 @@ export default function PageHeader({ title, titleMr, subtitle, themeColor = "#1E
         <h1 className="text-2xl md:text-4xl font-extrabold tracking-tight mb-2">
           {title}
         </h1>
-        {titleMr && (
+        {secondaryTitle && secondaryTitle !== title && (
           <p className="text-lg md:text-xl text-amber-300 font-medium mb-3 font-devanagari">
-            {titleMr}
+            {secondaryTitle}
           </p>
         )}
         {subtitle && (

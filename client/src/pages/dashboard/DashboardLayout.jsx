@@ -1,5 +1,6 @@
 import React from 'react';
 import { Navigate, Routes, Route, Link, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../context/AuthContext';
 import AdminDashboard from './AdminDashboard';
 import TeacherDashboard from './TeacherDashboard';
@@ -16,6 +17,7 @@ const getRoleType = (role) => {
 };
 
 export default function DashboardLayout() {
+  const { t } = useTranslation(['auth', 'dashboard', 'common']);
   const { isAuthenticated, user, logout } = useAuth();
   const location = useLocation();
 
@@ -24,6 +26,12 @@ export default function DashboardLayout() {
   }
 
   const roleType = getRoleType(user?.role);
+
+  const getRoleLabel = () => {
+    if (roleType === 'admin') return t('dashboard.managementTitle');
+    if (roleType === 'teacher') return t('dashboard.teacherDashboard');
+    return t('dashboard.studentDashboard');
+  };
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100">
@@ -37,12 +45,12 @@ export default function DashboardLayout() {
               <div className="w-8 h-8 rounded-full bg-amber-400 text-slate-950 flex items-center justify-center font-bold text-sm">
                 ZP
               </div>
-              <span className="font-bold text-sm text-white hidden sm:inline">School Portal</span>
+              <span className="font-bold text-sm text-white hidden sm:inline">{t('auth.schoolPortal')}</span>
             </Link>
             <span className="text-slate-600">|</span>
             <div className="flex items-center gap-2 text-xs text-amber-400 font-semibold bg-slate-800 px-3 py-1 rounded-full border border-slate-700">
               <Shield className="w-3.5 h-3.5" />
-              <span className="capitalize">{roleType} Dashboard ({user?.role?.replace('_', ' ')})</span>
+              <span>{getRoleLabel()} ({user?.role?.replace('_', ' ')})</span>
             </div>
           </div>
 
@@ -59,7 +67,7 @@ export default function DashboardLayout() {
               className="flex items-center gap-1.5 bg-rose-600/20 hover:bg-rose-600 text-rose-300 hover:text-white px-3 py-1.5 rounded-lg border border-rose-500/30 transition font-bold"
             >
               <LogOut className="w-3.5 h-3.5" />
-              <span>Logout</span>
+              <span>{t('auth.logout')}</span>
             </button>
           </div>
 
@@ -107,4 +115,5 @@ export default function DashboardLayout() {
     </div>
   );
 }
+
 

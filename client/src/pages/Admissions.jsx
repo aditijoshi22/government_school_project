@@ -1,10 +1,14 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import axios from 'axios';
 import PageHeader from '../components/common/PageHeader';
-import { SECTIONS_CONFIG } from '@shared/sections.config';
+import { SECTIONS_CONFIG, getClassLabel } from '@shared/sections.config';
 import { CheckCircle2, FileText, Send, AlertCircle, Sparkles } from 'lucide-react';
 
 export default function Admissions() {
+  const { t, i18n } = useTranslation();
+  const currentLang = i18n.language?.startsWith('mr') ? 'mr' : i18n.language?.startsWith('hi') ? 'hi' : 'en';
+
   const [formData, setFormData] = useState({
     applicant_name: '',
     gender: 'Male',
@@ -66,24 +70,23 @@ export default function Admissions() {
         });
         setDocumentFile(null);
       } else {
-        setErrorMsg(res.data.message);
+        setErrorMsg(res.data.message || t('validation.required', 'Submission failed.'));
       }
     } catch (err) {
-      setErrorMsg(err.response?.data?.message || 'Submission failed. Please check fields and try again.');
+      setErrorMsg(err.response?.data?.message || t('errors.serverError', 'Submission failed. Please check fields and try again.'));
     } finally {
       setSubmitting(false);
     }
   };
 
-  const currentSection = SECTIONS_CONFIG.find(s => s.id === formData.section_id);
+  const currentSection = SECTIONS_CONFIG.find(s => s.id === formData.section_id) || SECTIONS_CONFIG[0];
 
   return (
     <div className="space-y-12 pb-16">
       <PageHeader
-        title="Online Admissions Portal 2026-27"
-        titleMr="ऑनलाइन प्रवेश प्रक्रिया २०२६-२७"
-        subtitle="Apply for Class 1 to 12 across Primary, Secondary, and High School Junior College streams."
-        badgeText="Admissions Open"
+        title={t('admissions.pageTitle', 'Online Admissions Portal 2026-27')}
+        subtitle={t('admissions.pageSubtitle', 'Apply for Class 1 to 12 across Primary, Secondary, and High School Junior College streams.')}
+        badgeText={t('admissions.badge', 'Admissions Open')}
       />
 
       <div className="max-w-7xl mx-auto px-4 grid grid-cols-1 lg:grid-cols-12 gap-8">
@@ -94,18 +97,18 @@ export default function Admissions() {
           <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-sm space-y-4">
             <h3 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
               <CheckCircle2 className="w-5 h-5 text-emerald-500" />
-              <span>Admission Criteria & Guidelines</span>
+              <span>{t('admissions.guidelinesTitle', 'Admission Criteria & Guidelines')}</span>
             </h3>
 
             <div className="space-y-3 text-xs text-slate-600 dark:text-slate-300">
               <div className="p-3 bg-amber-50 dark:bg-amber-950/40 rounded-2xl border border-amber-200 dark:border-amber-900">
-                <strong className="text-amber-800 dark:text-amber-300">Primary (Class 1-4):</strong> Minimum age 6 years as of 31st December for Class 1. RTE 25% quota reserved for eligible categories.
+                {t('admissions.primaryCriteria')}
               </div>
               <div className="p-3 bg-emerald-50 dark:bg-emerald-950/40 rounded-2xl border border-emerald-200 dark:border-emerald-900">
-                <strong className="text-emerald-800 dark:text-emerald-300">Secondary (Class 5-10):</strong> Transfer Certificate (TC) from recognized school along with previous year marksheet required.
+                {t('admissions.secondaryCriteria')}
               </div>
               <div className="p-3 bg-blue-50 dark:bg-blue-950/40 rounded-2xl border border-blue-200 dark:border-blue-900">
-                <strong className="text-blue-800 dark:text-blue-300">High School (Class 11-12):</strong> Stream selection based on Class 10 Board exam percentage. Science (Min 60%), Commerce (Min 50%), Arts (Open).
+                {t('admissions.highSchoolCriteria')}
               </div>
             </div>
           </div>
@@ -114,28 +117,32 @@ export default function Admissions() {
           <div className="bg-slate-900 text-white rounded-3xl p-6 shadow-lg border border-slate-800 space-y-4">
             <h4 className="font-bold text-amber-400 text-sm flex items-center gap-2">
               <FileText className="w-4 h-4" />
-              <span>Required Documents Checklist</span>
+              <span>{t('admissions.checklistTitle', 'Required Documents Checklist')}</span>
             </h4>
             <ul className="space-y-2 text-xs text-slate-300">
               <li className="flex items-center gap-2">
                 <span className="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
-                <span>Original Transfer Certificate (TC) / School Leaving</span>
+                <span>{t('admissions.docBirthCert')}</span>
               </li>
               <li className="flex items-center gap-2">
                 <span className="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
-                <span>Attested copy of Birth Certificate (for Class 1)</span>
+                <span>{t('admissions.docTC')}</span>
               </li>
               <li className="flex items-center gap-2">
                 <span className="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
-                <span>Class 10 SSC Marksheet (for Class 11 admission)</span>
+                <span>{t('admissions.docMarksheet')}</span>
               </li>
               <li className="flex items-center gap-2">
                 <span className="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
-                <span>Student Aadhar Card & Caste Certificate (if applicable)</span>
+                <span>{t('admissions.docAadhar')}</span>
               </li>
               <li className="flex items-center gap-2">
                 <span className="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
-                <span>3 Recent Passport Size Photographs</span>
+                <span>{t('admissions.docPhotos')}</span>
+              </li>
+              <li className="flex items-center gap-2">
+                <span className="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
+                <span>{t('admissions.docIncome')}</span>
               </li>
             </ul>
           </div>
@@ -148,19 +155,20 @@ export default function Admissions() {
             
             <div className="mb-6">
               <h3 className="text-xl font-extrabold text-slate-900 dark:text-white">
-                Online Student Registration Form
+                {t('admissions.formTitle', 'Student Online Admission Application Form')}
               </h3>
-              <p className="text-xs text-slate-500">Fill in student details accurately. Submitted applications will be reviewed by section heads.</p>
+              <p className="text-xs text-slate-500">{t('admissions.formSubtitle', 'Please fill the correct details as per official documents.')}</p>
             </div>
 
             {submissionResult && (
               <div className="mb-6 p-4 bg-emerald-50 text-emerald-800 border border-emerald-300 rounded-2xl text-xs space-y-1">
                 <div className="font-bold text-sm flex items-center gap-2">
                   <Sparkles className="w-4 h-4 text-emerald-600" />
-                  <span>{submissionResult.message}</span>
+                  <span>{t('admissions.successTitle', 'Application Submitted Successfully!')}</span>
                 </div>
-                <p>Application Registration Number: <strong className="font-mono text-emerald-900">{submissionResult.application_no}</strong></p>
-                <p>Please note this application number for future reference.</p>
+                <p>{t('admissions.applicationNumber', 'Application Number')}: <strong className="font-mono text-emerald-900">{submissionResult.application_no}</strong></p>
+                <p>{t('admissions.saveAppNotice')}</p>
+                <p className="text-[11px] text-emerald-700">{t('admissions.offlineVerificationNote')}</p>
               </div>
             )}
 
@@ -176,26 +184,29 @@ export default function Admissions() {
               {/* Target Section Selection */}
               <div>
                 <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-2">
-                  Select Academic Section *
+                  {t('admissions.selectSection', 'Select Academic Section')} *
                 </label>
                 <div className="grid grid-cols-3 gap-2">
-                  {SECTIONS_CONFIG.map(sec => (
-                    <button
-                      key={sec.id}
-                      type="button"
-                      onClick={() => handleSectionChange(sec.id)}
-                      className={`p-3 rounded-xl border text-xs font-bold transition text-center ${
-                        formData.section_id === sec.id
-                          ? 'text-white border-transparent shadow'
-                          : 'bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200'
-                      }`}
-                      style={{
-                        backgroundColor: formData.section_id === sec.id ? sec.themeColor : undefined
-                      }}
-                    >
-                      {sec.shortName}
-                    </button>
-                  ))}
+                  {SECTIONS_CONFIG.map(sec => {
+                    const shortName = typeof sec.shortName === 'object' ? (sec.shortName[currentLang] || sec.shortName.en) : sec.shortName;
+                    return (
+                      <button
+                        key={sec.id}
+                        type="button"
+                        onClick={() => handleSectionChange(sec.id)}
+                        className={`p-3 rounded-xl border text-xs font-bold transition text-center ${
+                          formData.section_id === sec.id
+                            ? 'text-white border-transparent shadow'
+                            : 'bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200'
+                        }`}
+                        style={{
+                          backgroundColor: formData.section_id === sec.id ? sec.themeColor : undefined
+                        }}
+                      >
+                        {shortName}
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
 
@@ -203,7 +214,7 @@ export default function Admissions() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                    Select Class *
+                    {t('admissions.selectClass', 'Select Class')} *
                   </label>
                   <select
                     value={formData.class_number}
@@ -211,7 +222,7 @@ export default function Admissions() {
                     className="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-medium text-slate-900 dark:text-white focus:ring-2 focus:ring-amber-500"
                   >
                     {currentSection.classes.map(c => (
-                      <option key={c} value={c}>Class {c}</option>
+                      <option key={c} value={c}>{getClassLabel(c, currentLang)}</option>
                     ))}
                   </select>
                 </div>
@@ -219,16 +230,16 @@ export default function Admissions() {
                 {formData.section_id === 'high-school' && (
                   <div>
                     <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                      Stream (Class 11 & 12) *
+                      {t('admissions.selectStream', 'Stream')} *
                     </label>
                     <select
                       value={formData.stream}
                       onChange={(e) => setFormData({ ...formData, stream: e.target.value })}
                       className="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-medium text-slate-900 dark:text-white focus:ring-2 focus:ring-amber-500"
                     >
-                      <option value="science">Science Stream (विज्ञान)</option>
-                      <option value="commerce">Commerce Stream (वाणिज्य)</option>
-                      <option value="arts">Arts Stream (कला)</option>
+                      <option value="science">{t('admissions.streamScience', 'Science Stream')}</option>
+                      <option value="commerce">{t('admissions.streamCommerce', 'Commerce Stream')}</option>
+                      <option value="arts">{t('admissions.streamArts', 'Arts Stream')}</option>
                     </select>
                   </div>
                 )}
@@ -238,12 +249,12 @@ export default function Admissions() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                    Applicant Full Name *
+                    {t('admissions.applicantName', 'Applicant Full Name')} *
                   </label>
                   <input
                     type="text"
                     required
-                    placeholder="e.g. Sarthak Ramesh Kulkarni"
+                    placeholder={t('admissions.applicantNamePlaceholder', 'e.g. Sarthak Ramesh Kulkarni')}
                     value={formData.applicant_name}
                     onChange={(e) => setFormData({ ...formData, applicant_name: e.target.value })}
                     className="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white"
@@ -252,16 +263,16 @@ export default function Admissions() {
 
                 <div>
                   <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                    Gender *
+                    {t('admissions.gender', 'Gender')} *
                   </label>
                   <select
                     value={formData.gender}
                     onChange={(e) => setFormData({ ...formData, gender: e.target.value })}
                     className="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-medium text-slate-900 dark:text-white"
                   >
-                    <option value="Male">Male</option>
-                    <option value="Female">Female</option>
-                    <option value="Other">Other</option>
+                    <option value="Male">{t('admissions.genderMale', 'Male')}</option>
+                    <option value="Female">{t('admissions.genderFemale', 'Female')}</option>
+                    <option value="Other">{t('admissions.genderOther', 'Other')}</option>
                   </select>
                 </div>
               </div>
@@ -269,7 +280,7 @@ export default function Admissions() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                    Date of Birth *
+                    {t('admissions.dob', 'Date of Birth')} *
                   </label>
                   <input
                     type="date"
@@ -282,12 +293,12 @@ export default function Admissions() {
 
                 <div>
                   <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                    Parent / Guardian Name *
+                    {t('admissions.parentName', 'Parent / Guardian Full Name')} *
                   </label>
                   <input
                     type="text"
                     required
-                    placeholder="e.g. Ramesh V. Kulkarni"
+                    placeholder={t('admissions.parentNamePlaceholder', 'e.g. Ramesh V. Kulkarni')}
                     value={formData.parent_name}
                     onChange={(e) => setFormData({ ...formData, parent_name: e.target.value })}
                     className="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white"
@@ -299,12 +310,12 @@ export default function Admissions() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                    Mobile Number *
+                    {t('admissions.phone', 'Mobile Number')} *
                   </label>
                   <input
                     type="tel"
                     required
-                    placeholder="+91 9876543210"
+                    placeholder={t('admissions.phonePlaceholder', '10-digit mobile number')}
                     value={formData.phone}
                     onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                     className="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white"
@@ -313,11 +324,11 @@ export default function Admissions() {
 
                 <div>
                   <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                    Email Address (Optional)
+                    {t('admissions.email', 'Email Address (Optional)')}
                   </label>
                   <input
                     type="email"
-                    placeholder="parent@gmail.com"
+                    placeholder={t('admissions.emailPlaceholder', 'parent@gmail.com')}
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                     className="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white"
@@ -328,11 +339,11 @@ export default function Admissions() {
               {/* Previous School & Document Upload */}
               <div>
                 <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                  Previous School Name & Location
+                  {t('admissions.previousSchool', 'Previous School Name & Location')}
                 </label>
                 <input
                   type="text"
-                  placeholder="e.g. Z.P. Primary School, Anjangaon"
+                  placeholder={t('admissions.previousSchoolPlaceholder', 'e.g. Z.P. Primary School')}
                   value={formData.previous_school}
                   onChange={(e) => setFormData({ ...formData, previous_school: e.target.value })}
                   className="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white"
@@ -341,7 +352,7 @@ export default function Admissions() {
 
               <div>
                 <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                  Upload TC / Marksheet PDF or JPG (Max 10MB)
+                  {t('admissions.uploadDocs', 'Upload TC / Marksheet PDF or JPG (Max 5MB)')}
                 </label>
                 <input
                   type="file"
@@ -357,7 +368,7 @@ export default function Admissions() {
                 className="w-full py-3.5 bg-slate-900 hover:bg-slate-800 text-amber-400 font-bold rounded-xl text-sm shadow-md transition flex items-center justify-center gap-2 disabled:opacity-50"
               >
                 <Send className="w-4 h-4" />
-                <span>{submitting ? 'Submitting Application...' : 'Submit Admission Application'}</span>
+                <span>{submitting ? t('admissions.submittingBtn', 'Submitting Application...') : t('admissions.submitBtn', 'Submit Admission Application')}</span>
               </button>
 
             </form>

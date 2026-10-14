@@ -1,14 +1,17 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import axios from 'axios';
 import SectionTabs from '../../components/ui/SectionTabs';
 import StatCard from '../../components/ui/StatCard';
 import DataTable from '../../components/ui/DataTable';
 import Modal from '../../components/common/Modal';
-import { SECTIONS_CONFIG, getSectionById } from '@shared/sections.config';
-import { Users, GraduationCap, FileText, Bell, CheckCircle, XCircle, Plus, Send, BarChart2, Award, Sparkles } from 'lucide-react';
+import { SECTIONS_CONFIG, getSectionById, getSectionName } from '@shared/sections.config';
+import { Users, GraduationCap, FileText, Bell, CheckCircle, XCircle, Plus, Sparkles } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+import { formatLocalizedNumber, formatLocalizedDate } from '../../utils/bilingual';
 
 export default function AdminDashboard({ user }) {
+  const { t, i18n } = useTranslation(['dashboard', 'common', 'sections']);
   const isSuperAdmin = user?.role === 'super_admin' || user?.role === 'admin';
   const defaultTab = isSuperAdmin ? 'overview' : (user?.section_id || 'primary');
 
@@ -19,10 +22,20 @@ export default function AdminDashboard({ user }) {
   const [noticesList, setNoticesList] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Notice Publisher state
+  // Notice Publisher state with Language Tabs
   const [noticeModalOpen, setNoticeModalOpen] = useState(false);
   const [editingNoticeId, setEditingNoticeId] = useState(null);
-  const [noticeForm, setNoticeForm] = useState({ title_en: '', title_mr: '', content_en: '', content_mr: '', category: 'general', is_important: false });
+  const [noticeLangTab, setNoticeLangTab] = useState('en'); // 'en' | 'mr' | 'hi'
+  const [noticeForm, setNoticeForm] = useState({
+    title_en: '',
+    title_mr: '',
+    title_hi: '',
+    content_en: '',
+    content_mr: '',
+    content_hi: '',
+    category: 'general',
+    is_important: false
+  });
 
   // Marks / Progress Report Entry Modal state
   const [marksModalOpen, setMarksModalOpen] = useState(false);
@@ -74,8 +87,8 @@ export default function AdminDashboard({ user }) {
     e.preventDefault();
     const payload = {
       ...noticeForm,
-      title: noticeForm.title_en || noticeForm.title_mr,
-      content: noticeForm.content_en || noticeForm.content_mr,
+      title: noticeForm.title_en || noticeForm.title_mr || noticeForm.title_hi,
+      content: noticeForm.content_en || noticeForm.content_mr || noticeForm.content_hi,
       section_id: activeTab === 'overview' ? 'all' : activeTab
     };
 
@@ -87,7 +100,16 @@ export default function AdminDashboard({ user }) {
       if (res.data.success) {
         setNoticeModalOpen(false);
         setEditingNoticeId(null);
-        setNoticeForm({ title_en: '', title_mr: '', content_en: '', content_mr: '', category: 'general', is_important: false });
+        setNoticeForm({
+          title_en: '',
+          title_mr: '',
+          title_hi: '',
+          content_en: '',
+          content_mr: '',
+          content_hi: '',
+          category: 'general',
+          is_important: false
+        });
         fetchDashboardData();
       }
     });
@@ -98,16 +120,19 @@ export default function AdminDashboard({ user }) {
     setNoticeForm({
       title_en: notice.title_en || notice.title || '',
       title_mr: notice.title_mr || '',
+      title_hi: notice.title_hi || '',
       content_en: notice.content_en || notice.content || '',
       content_mr: notice.content_mr || '',
+      content_hi: notice.content_hi || '',
       category: notice.category || 'general',
       is_important: notice.is_important === 1
     });
+    setNoticeLangTab('en');
     setNoticeModalOpen(true);
   };
 
   const handleDeleteNotice = (id) => {
-    if (window.confirm('Are you sure you want to delete this notice?')) {
+    if (window.confirm(i18n.language === 'mr' ? 'तुम्हाला ही सूचना हटवायची आहे का?' : i18n.language === 'hi' ? 'क्या आप इस सूचना को हटाना चाहते हैं?' : 'Are you sure you want to delete this notice?')) {
       axios.delete(`/api/admin/notices/${id}`).then(res => {
         if (res.data.success) fetchDashboardData();
       });
@@ -136,14 +161,14 @@ export default function AdminDashboard({ user }) {
   const COLORS = ['#10B981', '#2563EB', '#F59E0B', '#EF4444'];
 
   const studentColumns = [
-    { header: 'GR No', accessor: 'gr_number', render: (r) => <span className="font-mono font-bold">{r.gr_number}</span> },
-    { header: 'Roll', accessor: 'roll_number' },
-    { header: 'Student Name', render: (r) => <span className="font-semibold text-slate-900 dark:text-white">{r.first_name} {r.last_name}</span> },
-    { header: 'Class', render: (r) => `Class ${r.class_number} (${r.division_name})` },
-    { header: 'Gender', accessor: 'gender' },
-    { header: 'Parent Phone', accessor: 'phone' },
+    { header: t('dashboard.grNo'), accessor: 'gr_number', render: (r) => <span className="font-mono font-bold">{r.gr_number}</span> },
+    { header: t('dashboard.rollNo'), accessor: 'roll_number' },
+    { header: t('dashboard.studentName'), render: (r) => <span className="font-semibold text-slate-900 dark:text-white">{r.first_name} {r.last_name}</span> },
+    { header: t('dashboard.classDivision'), render: (r) => `Class ${r.class_number} (${r.division_name})` },
+    { header: t('dashboard.gender'), accessor: 'gender' },
+    { header: t('dashboard.parentContact'), accessor: 'phone' },
     {
-      header: 'Action',
+      header: t('dashboard.actions'),
       render: (r) => (
         <button
           onClick={() => {
@@ -152,7 +177,7 @@ export default function AdminDashboard({ user }) {
           }}
           className="px-3 py-1 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs rounded-lg transition"
         >
-          {currentSection?.assessmentType === 'grade-based' ? 'Enter Report Card' : 'Enter Marks'}
+          {currentSection?.assessmentType === 'grade-based' ? t('dashboard.primarySectionCount') : t('dashboard.enterMarks')}
         </button>
       )
     }
@@ -165,15 +190,29 @@ export default function AdminDashboard({ user }) {
       <div>
         <div className="flex items-center justify-between mb-3">
           <div>
-            <h2 className="text-2xl font-extrabold text-slate-900 dark:text-white">Management Dashboard</h2>
-            <p className="text-xs text-slate-500">Switch tabs to view and manage section-specific academic data.</p>
+            <h2 className="text-2xl font-extrabold text-slate-900 dark:text-white">{t('dashboard.managementTitle')}</h2>
+            <p className="text-xs text-slate-500">{t('dashboard.publishNoticeDesc')}</p>
           </div>
           <button
-            onClick={() => setNoticeModalOpen(true)}
+            onClick={() => {
+              setEditingNoticeId(null);
+              setNoticeForm({
+                title_en: '',
+                title_mr: '',
+                title_hi: '',
+                content_en: '',
+                content_mr: '',
+                content_hi: '',
+                category: 'general',
+                is_important: false
+              });
+              setNoticeLangTab('en');
+              setNoticeModalOpen(true);
+            }}
             className="px-4 py-2 bg-slate-900 text-amber-400 hover:bg-slate-800 font-bold rounded-xl text-xs flex items-center gap-2 shadow"
           >
             <Plus className="w-4 h-4" />
-            <span>Publish Notice</span>
+            <span>{t('dashboard.publishNotice')}</span>
           </button>
         </div>
 
@@ -189,25 +228,25 @@ export default function AdminDashboard({ user }) {
         <div className="p-4 rounded-2xl flex items-center justify-between text-xs font-semibold" style={{ backgroundColor: currentSection.themeBg, color: currentSection.themeColor }}>
           <div className="flex items-center gap-2">
             <Sparkles className="w-4 h-4" />
-            <span>Active Context: <strong>{currentSection.nameEn}</strong> (Assessment Mode: {currentSection.assessmentType})</span>
+            <span>{t('dashboard.activeContext')}: <strong>{getSectionName(currentSection, i18n.language)}</strong> ({currentSection.assessmentType})</span>
           </div>
-          <span>Section Head: {currentSection.sectionHead}</span>
+          <span>{t('sections.sectionHead')}: {currentSection.sectionHead}</span>
         </div>
       )}
 
       {/* Stats Cards Row */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        <StatCard title="Total Students" value={stats?.totalStudents || 0} icon={Users} color="blue" subtitle="Enrolled in active section" />
-        <StatCard title="Section Faculty" value={stats?.totalTeachers || 0} icon={GraduationCap} color="emerald" subtitle="Assigned teachers" />
-        <StatCard title="Pending Admissions" value={stats?.pendingAdmissions || 0} icon={FileText} color="amber" subtitle="Awaiting review" />
-        <StatCard title="Active Notices" value={stats?.totalNotices || 0} icon={Bell} color="rose" subtitle="Published circulars" />
+        <StatCard title={t('dashboard.totalStudents')} value={stats?.totalStudents || 0} icon={Users} color="blue" subtitle={t('dashboard.studentRecords')} />
+        <StatCard title={t('dashboard.manageFaculty')} value={stats?.totalTeachers || 0} icon={GraduationCap} color="emerald" subtitle={t('dashboard.manageFacultyDesc')} />
+        <StatCard title={t('dashboard.pendingAdmissions')} value={stats?.pendingAdmissions || 0} icon={FileText} color="amber" subtitle={t('dashboard.newAdmissionDesc')} />
+        <StatCard title={t('dashboard.tabNotices')} value={stats?.totalNotices || 0} icon={Bell} color="rose" subtitle={t('dashboard.manageNotices')} />
       </div>
 
       {/* Charts Row */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Class Strength Bar Chart */}
         <div className="lg:col-span-8 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-sm">
-          <h3 className="text-sm font-bold text-slate-900 dark:text-white mb-4">Class-Wise Student Distribution</h3>
+          <h3 className="text-sm font-bold text-slate-900 dark:text-white mb-4">{t('dashboard.classWiseDistribution')}</h3>
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={stats?.classStrength || []}>
@@ -222,7 +261,7 @@ export default function AdminDashboard({ user }) {
 
         {/* Gender Ratio Pie Chart */}
         <div className="lg:col-span-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-sm">
-          <h3 className="text-sm font-bold text-slate-900 dark:text-white mb-4">Gender Ratio</h3>
+          <h3 className="text-sm font-bold text-slate-900 dark:text-white mb-4">{t('dashboard.gender')}</h3>
           <div className="h-64 flex items-center justify-center">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
@@ -240,27 +279,27 @@ export default function AdminDashboard({ user }) {
 
       {/* Student Records Table */}
       <div className="space-y-4">
-        <h3 className="text-lg font-bold text-slate-900 dark:text-white">Enrolled Students & Marksheet Entry</h3>
+        <h3 className="text-lg font-bold text-slate-900 dark:text-white">{t('dashboard.assignedClassStudents')}</h3>
         <DataTable
           columns={studentColumns}
           data={students}
-          searchPlaceholder="Search student by name or GR number..."
+          searchPlaceholder={t('common.search')}
         />
       </div>
 
       {/* Pending Admissions Review Table */}
       <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-sm space-y-4">
-        <h3 className="text-lg font-bold text-slate-900 dark:text-white">Pending Admission Applications</h3>
+        <h3 className="text-lg font-bold text-slate-900 dark:text-white">{t('dashboard.onlineAdmissionsManagement')}</h3>
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs">
             <thead className="bg-slate-50 dark:bg-slate-800 text-slate-500 font-bold uppercase">
               <tr>
-                <th className="p-3">App No</th>
-                <th className="p-3">Applicant Name</th>
-                <th className="p-3">Class</th>
-                <th className="p-3">Parent & Phone</th>
-                <th className="p-3">Status</th>
-                <th className="p-3">Actions</th>
+                <th className="p-3">{t('dashboard.appNo')}</th>
+                <th className="p-3">{t('dashboard.applicant')}</th>
+                <th className="p-3">{t('dashboard.appliedFor')}</th>
+                <th className="p-3">{t('dashboard.parentName')} & {t('dashboard.phone')}</th>
+                <th className="p-3">{t('common.status')}</th>
+                <th className="p-3">{t('dashboard.actions')}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 dark:divide-slate-800 text-slate-800 dark:text-slate-200">
@@ -274,21 +313,21 @@ export default function AdminDashboard({ user }) {
                     <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
                       adm.status === 'approved' ? 'bg-emerald-100 text-emerald-800' : adm.status === 'rejected' ? 'bg-rose-100 text-rose-800' : 'bg-amber-100 text-amber-800'
                     }`}>
-                      {adm.status}
+                      {adm.status === 'approved' ? t('common.approved') : adm.status === 'rejected' ? t('common.rejected') : t('common.pending')}
                     </span>
                   </td>
                   <td className="p-3 flex items-center gap-2">
                     <button
                       onClick={() => handleAdmissionStatus(adm.id, 'approved')}
                       className="p-1 text-emerald-600 hover:bg-emerald-50 rounded"
-                      title="Approve"
+                      title={t('common.approved')}
                     >
                       <CheckCircle className="w-4 h-4" />
                     </button>
                     <button
                       onClick={() => handleAdmissionStatus(adm.id, 'rejected')}
                       className="p-1 text-rose-600 hover:bg-rose-50 rounded"
-                      title="Reject"
+                      title={t('common.rejected')}
                     >
                       <XCircle className="w-4 h-4" />
                     </button>
@@ -303,17 +342,27 @@ export default function AdminDashboard({ user }) {
       {/* Notice Management Table */}
       <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-sm space-y-4">
         <div className="flex items-center justify-between">
-          <h3 className="text-lg font-bold text-slate-900 dark:text-white">Published Notices Management</h3>
+          <h3 className="text-lg font-bold text-slate-900 dark:text-white">{t('dashboard.manageNotices')}</h3>
           <button
             onClick={() => {
               setEditingNoticeId(null);
-              setNoticeForm({ title_en: '', title_mr: '', content_en: '', content_mr: '', category: 'general', is_important: false });
+              setNoticeForm({
+                title_en: '',
+                title_mr: '',
+                title_hi: '',
+                content_en: '',
+                content_mr: '',
+                content_hi: '',
+                category: 'general',
+                is_important: false
+              });
+              setNoticeLangTab('en');
               setNoticeModalOpen(true);
             }}
             className="px-3 py-1.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs rounded-xl flex items-center gap-1 shadow"
           >
             <Plus className="w-3.5 h-3.5" />
-            <span>Add New Notice</span>
+            <span>{t('dashboard.publishNotice')}</span>
           </button>
         </div>
 
@@ -321,11 +370,11 @@ export default function AdminDashboard({ user }) {
           <table className="w-full text-left text-xs">
             <thead className="bg-slate-50 dark:bg-slate-800 text-slate-500 font-bold uppercase">
               <tr>
-                <th className="p-3">Title</th>
-                <th className="p-3">Category</th>
-                <th className="p-3">Section</th>
-                <th className="p-3">Date</th>
-                <th className="p-3">Actions</th>
+                <th className="p-3">{t('dashboard.noticeTitle')}</th>
+                <th className="p-3">{t('dashboard.category')}</th>
+                <th className="p-3">{t('dashboard.targetSection')}</th>
+                <th className="p-3">{t('dashboard.date')}</th>
+                <th className="p-3">{t('dashboard.actions')}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 dark:divide-slate-800 text-slate-800 dark:text-slate-200">
@@ -337,20 +386,20 @@ export default function AdminDashboard({ user }) {
                       {n.category}
                     </span>
                   </td>
-                  <td className="p-3 capitalize">{n.section_id || 'All Sections'}</td>
-                  <td className="p-3 text-slate-500">{n.created_at?.split('T')[0] || n.created_at}</td>
+                  <td className="p-3 capitalize">{n.section_id || t('common.allSections')}</td>
+                  <td className="p-3 text-slate-500">{formatLocalizedDate(n.created_at, i18n.language)}</td>
                   <td className="p-3 flex items-center gap-2">
                     <button
                       onClick={() => handleEditNotice(n)}
                       className="p-1 text-blue-600 hover:bg-blue-50 rounded"
-                      title="Edit Notice"
+                      title={t('common.edit')}
                     >
                       <FileText className="w-4 h-4" />
                     </button>
                     <button
                       onClick={() => handleDeleteNotice(n.id)}
                       className="p-1 text-rose-600 hover:bg-rose-50 rounded"
-                      title="Delete Notice"
+                      title={t('common.delete')}
                     >
                       <XCircle className="w-4 h-4" />
                     </button>
@@ -361,69 +410,162 @@ export default function AdminDashboard({ user }) {
           </table>
         </div>
       </div>
-      <Modal isOpen={noticeModalOpen} onClose={() => setNoticeModalOpen(false)} title="Publish Official Circular">
+
+      {/* Multilingual Notice Modal with Language Tabs (Requirement 5) */}
+      <Modal isOpen={noticeModalOpen} onClose={() => setNoticeModalOpen(false)} title={editingNoticeId ? t('common.edit') : t('dashboard.publishNotice')}>
         <form onSubmit={handleNoticeSubmit} className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            <div>
-              <label className="block text-xs font-semibold mb-1">Notice Title (English) *</label>
-              <input
-                type="text"
-                required
-                placeholder="e.g. Annual Examination Timetable"
-                value={noticeForm.title_en}
-                onChange={(e) => setNoticeForm({ ...noticeForm, title_en: e.target.value })}
-                className="w-full p-2.5 bg-slate-50 border rounded-xl text-xs"
-              />
-            </div>
-            <div>
-              <label className="block text-xs font-semibold mb-1">Notice Title (Marathi / मराठी) *</label>
-              <input
-                type="text"
-                required
-                placeholder="उदा. वार्षिक परीक्षा वेळापत्रक"
-                value={noticeForm.title_mr}
-                onChange={(e) => setNoticeForm({ ...noticeForm, title_mr: e.target.value })}
-                className="w-full p-2.5 bg-slate-50 border rounded-xl text-xs font-devanagari"
-              />
-            </div>
+          
+          {/* Language Selection Tabs */}
+          <div className="flex border-b border-slate-200 dark:border-slate-700 gap-2 pb-2">
+            <button
+              type="button"
+              onClick={() => setNoticeLangTab('en')}
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1 ${
+                noticeLangTab === 'en'
+                  ? 'bg-slate-900 text-amber-400 shadow'
+                  : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300'
+              }`}
+            >
+              <span>{t('dashboard.tabEnglish')}</span>
+              <span className="text-[10px] text-amber-400 font-normal">({i18n.language === 'mr' ? 'आवश्यक' : 'Required'})</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setNoticeLangTab('mr')}
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1 ${
+                noticeLangTab === 'mr'
+                  ? 'bg-slate-900 text-amber-400 shadow'
+                  : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300'
+              }`}
+            >
+              <span>{t('dashboard.tabMarathi')}</span>
+              <span className="text-[10px] text-slate-400 font-normal">({i18n.language === 'mr' ? 'ऐच्छिक' : 'Optional'})</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setNoticeLangTab('hi')}
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1 ${
+                noticeLangTab === 'hi'
+                  ? 'bg-slate-900 text-amber-400 shadow'
+                  : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300'
+              }`}
+            >
+              <span>{t('dashboard.tabHindi')}</span>
+              <span className="text-[10px] text-slate-400 font-normal">({i18n.language === 'mr' ? 'ऐच्छिक' : 'Optional'})</span>
+            </button>
           </div>
+
+          {/* English Inputs Tab */}
+          {noticeLangTab === 'en' && (
+            <div className="space-y-3">
+              <div>
+                <label className="block text-xs font-semibold mb-1">{t('dashboard.fieldTitleEn')}</label>
+                <input
+                  type="text"
+                  required
+                  placeholder={t('dashboard.noticeTitlePlaceholderEn', 'e.g. Annual Sports Day & Cultural Meet 2026')}
+                  value={noticeForm.title_en}
+                  onChange={(e) => setNoticeForm({ ...noticeForm, title_en: e.target.value })}
+                  className="w-full p-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold mb-1">{t('dashboard.fieldDescEn')}</label>
+                <textarea
+                  rows="3"
+                  required
+                  placeholder={t('dashboard.noticeContentPlaceholderEn', 'Detailed circular content in English...')}
+                  value={noticeForm.content_en}
+                  onChange={(e) => setNoticeForm({ ...noticeForm, content_en: e.target.value })}
+                  className="w-full p-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs"
+                ></textarea>
+              </div>
+            </div>
+          )}
+
+          {/* Marathi Inputs Tab */}
+          {noticeLangTab === 'mr' && (
+            <div className="space-y-3">
+              <div>
+                <label className="block text-xs font-semibold mb-1">{t('dashboard.fieldTitleMr')}</label>
+                <input
+                  type="text"
+                  placeholder={t('dashboard.noticeTitlePlaceholderMr', 'उदा. वार्षिक क्रीडा स्पर्धा व स्नेहसंमेलन २०२६')}
+                  value={noticeForm.title_mr}
+                  onChange={(e) => setNoticeForm({ ...noticeForm, title_mr: e.target.value })}
+                  className="w-full p-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold mb-1">{t('dashboard.fieldDescMr')}</label>
+                <textarea
+                  rows="3"
+                  placeholder={t('dashboard.noticeContentPlaceholderMr', 'मराठीत परिपत्रकाची सविस्तर माहिती...')}
+                  value={noticeForm.content_mr}
+                  onChange={(e) => setNoticeForm({ ...noticeForm, content_mr: e.target.value })}
+                  className="w-full p-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs"
+                ></textarea>
+              </div>
+            </div>
+          )}
+
+          {/* Hindi Inputs Tab */}
+          {noticeLangTab === 'hi' && (
+            <div className="space-y-3">
+              <div>
+                <label className="block text-xs font-semibold mb-1">{t('dashboard.fieldTitleHi')}</label>
+                <input
+                  type="text"
+                  placeholder={t('dashboard.noticeTitlePlaceholderHi', 'उदा. वार्षिक खेलकूद एवं सांस्कृतिक महोत्सव 2026')}
+                  value={noticeForm.title_hi}
+                  onChange={(e) => setNoticeForm({ ...noticeForm, title_hi: e.target.value })}
+                  className="w-full p-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold mb-1">{t('dashboard.fieldDescHi')}</label>
+                <textarea
+                  rows="3"
+                  placeholder={t('dashboard.noticeContentPlaceholderHi', 'हिंदी में परिपत्र का विस्तृत विवरण...')}
+                  value={noticeForm.content_hi}
+                  onChange={(e) => setNoticeForm({ ...noticeForm, content_hi: e.target.value })}
+                  className="w-full p-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs"
+                ></textarea>
+              </div>
+            </div>
+          )}
+
           <div>
-            <label className="block text-xs font-semibold mb-1">Notice Category</label>
+            <label className="block text-xs font-semibold mb-1">{t('dashboard.category')}</label>
             <select
               value={noticeForm.category}
               onChange={(e) => setNoticeForm({ ...noticeForm, category: e.target.value })}
-              className="w-full p-2.5 bg-slate-50 border rounded-xl text-xs"
+              className="w-full p-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs"
             >
-              <option value="general">General Announcement</option>
-              <option value="exam">Examination / Schedule</option>
-              <option value="meeting">Parent-Teacher Meeting</option>
-              <option value="event">Sports & Cultural Event</option>
+              <option value="general">{t('dashboard.categoryGeneral', 'General Announcement')}</option>
+              <option value="exam">{t('dashboard.categoryExam', 'Examination / Schedule')}</option>
+              <option value="meeting">{t('dashboard.categoryMeeting', 'Parent-Teacher Meeting')}</option>
+              <option value="event">{t('dashboard.categoryEvent', 'Sports & Cultural Event')}</option>
             </select>
           </div>
-          <div>
-            <label className="block text-xs font-semibold mb-1">Notice Content (English) *</label>
-            <textarea
-              rows="3"
-              required
-              placeholder="English description..."
-              value={noticeForm.content_en}
-              onChange={(e) => setNoticeForm({ ...noticeForm, content_en: e.target.value })}
-              className="w-full p-2.5 bg-slate-50 border rounded-xl text-xs"
-            ></textarea>
+
+          <div className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              id="is_important"
+              checked={noticeForm.is_important}
+              onChange={(e) => setNoticeForm({ ...noticeForm, is_important: e.target.checked })}
+              className="rounded text-amber-500 focus:ring-amber-400"
+            />
+            <label htmlFor="is_important" className="text-xs font-medium cursor-pointer">
+              {t('common.badgeImportant')}
+            </label>
           </div>
-          <div>
-            <label className="block text-xs font-semibold mb-1">Notice Content (Marathi / मराठी) *</label>
-            <textarea
-              rows="3"
-              required
-              placeholder="मराठीत सविस्तर माहिती..."
-              value={noticeForm.content_mr}
-              onChange={(e) => setNoticeForm({ ...noticeForm, content_mr: e.target.value })}
-              className="w-full p-2.5 bg-slate-50 border rounded-xl text-xs font-devanagari"
-            ></textarea>
-          </div>
-          <button type="submit" className="w-full py-3 bg-amber-500 text-slate-950 font-bold rounded-xl text-xs shadow">
-            Publish Notice to Section
+
+          <button type="submit" className="w-full py-3 bg-amber-500 text-slate-950 font-bold rounded-xl text-xs shadow hover:bg-amber-400 transition">
+            {editingNoticeId ? t('common.save') : t('dashboard.publishNotice')}
           </button>
         </form>
       </Modal>
@@ -432,55 +574,55 @@ export default function AdminDashboard({ user }) {
       <Modal
         isOpen={marksModalOpen}
         onClose={() => setMarksModalOpen(false)}
-        title={currentSection?.assessmentType === 'grade-based' ? `Primary Progress Report (${selectedStudentForMarks?.first_name})` : `Academic Marks Entry (${selectedStudentForMarks?.first_name})`}
+        title={currentSection?.assessmentType === 'grade-based' ? `${t('dashboard.primarySectionCount')} (${selectedStudentForMarks?.first_name})` : `${t('dashboard.marksEntryModalTitle')} (${selectedStudentForMarks?.first_name})`}
       >
         <form onSubmit={handleSaveMarks} className="space-y-4 text-xs">
           {currentSection?.assessmentType === 'grade-based' ? (
             <div className="space-y-3">
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block font-semibold mb-1">Reading Grade</label>
+                  <label className="block font-semibold mb-1">{t('results.readingGrade', 'Reading Skill Grade')}</label>
                   <input type="text" value={progressReportForm.reading_grade} onChange={e => setProgressReportForm({...progressReportForm, reading_grade: e.target.value})} className="w-full p-2 border rounded-xl" />
                 </div>
                 <div>
-                  <label className="block font-semibold mb-1">Writing Grade</label>
+                  <label className="block font-semibold mb-1">{t('results.writingGrade', 'Writing Skill Grade')}</label>
                   <input type="text" value={progressReportForm.writing_grade} onChange={e => setProgressReportForm({...progressReportForm, writing_grade: e.target.value})} className="w-full p-2 border rounded-xl" />
                 </div>
                 <div>
-                  <label className="block font-semibold mb-1">Numeracy Grade</label>
+                  <label className="block font-semibold mb-1">{t('results.numeracyGrade', 'Numeracy Skill Grade')}</label>
                   <input type="text" value={progressReportForm.numeracy_grade} onChange={e => setProgressReportForm({...progressReportForm, numeracy_grade: e.target.value})} className="w-full p-2 border rounded-xl" />
                 </div>
                 <div>
-                  <label className="block font-semibold mb-1">Art & Craft Grade</label>
+                  <label className="block font-semibold mb-1">{t('results.artGrade', 'Art & Craft Grade')}</label>
                   <input type="text" value={progressReportForm.art_grade} onChange={e => setProgressReportForm({...progressReportForm, art_grade: e.target.value})} className="w-full p-2 border rounded-xl" />
                 </div>
               </div>
               <div>
-                <label className="block font-semibold mb-1">Teacher Remarks</label>
+                <label className="block font-semibold mb-1">{t('results.teacherOverallRemarks', "Teacher's Overall Remarks")}</label>
                 <textarea rows="3" value={progressReportForm.teacher_remarks} onChange={e => setProgressReportForm({...progressReportForm, teacher_remarks: e.target.value})} className="w-full p-2 border rounded-xl"></textarea>
               </div>
             </div>
           ) : (
             <div className="space-y-3">
               <div>
-                <label className="block font-semibold mb-1">Subject Name</label>
+                <label className="block font-semibold mb-1">{t('dashboard.subject')}</label>
                 <input type="text" value={marksForm.subject_name} onChange={e => setMarksForm({...marksForm, subject_name: e.target.value})} className="w-full p-2 border rounded-xl" />
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block font-semibold mb-1">Marks Obtained</label>
+                  <label className="block font-semibold mb-1">{t('dashboard.marksObtained')}</label>
                   <input type="number" value={marksForm.marks_obtained} onChange={e => setMarksForm({...marksForm, marks_obtained: parseFloat(e.target.value)})} className="w-full p-2 border rounded-xl" />
                 </div>
                 <div>
-                  <label className="block font-semibold mb-1">Max Marks</label>
+                  <label className="block font-semibold mb-1">{t('dashboard.maxMarks')}</label>
                   <input type="number" value={marksForm.max_marks} onChange={e => setMarksForm({...marksForm, max_marks: parseFloat(e.target.value)})} className="w-full p-2 border rounded-xl" />
                 </div>
               </div>
             </div>
           )}
 
-          <button type="submit" className="w-full py-3 bg-amber-500 text-slate-950 font-bold rounded-xl text-xs shadow">
-            Save Academic Record
+          <button type="submit" className="w-full py-3 bg-amber-500 text-slate-950 font-bold rounded-xl text-xs shadow hover:bg-amber-400 transition">
+            {t('dashboard.saveMarks')}
           </button>
         </form>
       </Modal>
@@ -488,3 +630,4 @@ export default function AdminDashboard({ user }) {
     </div>
   );
 }
+

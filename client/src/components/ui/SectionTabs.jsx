@@ -1,8 +1,12 @@
 import React from 'react';
-import { SECTIONS_CONFIG } from '@shared/sections.config';
+import { useTranslation } from 'react-i18next';
+import { SECTIONS_CONFIG, getSectionClasses } from '@shared/sections.config';
 import { Sparkles, BookOpen, GraduationCap, LayoutGrid } from 'lucide-react';
 
 export default function SectionTabs({ activeSection, onSelectSection, showOverview = true }) {
+  const { t, i18n } = useTranslation();
+  const currentLang = i18n.language?.startsWith('mr') ? 'mr' : i18n.language?.startsWith('hi') ? 'hi' : 'en';
+
   const getIcon = (iconName) => {
     switch (iconName) {
       case 'Sparkles': return <Sparkles className="w-4 h-4" />;
@@ -26,12 +30,16 @@ export default function SectionTabs({ activeSection, onSelectSection, showOvervi
             }`}
           >
             <LayoutGrid className="w-4 h-4 text-amber-400" />
-            <span>All Sections Overview</span>
+            <span>{t('common.allSections', 'All Sections Overview')}</span>
           </button>
         )}
 
         {SECTIONS_CONFIG.map((sec) => {
           const isActive = activeSection === sec.id;
+          const shortName = typeof sec.shortName === 'object' ? (sec.shortName[currentLang] || sec.shortName.en) : sec.shortName;
+          const classes = getSectionClasses(sec, currentLang);
+          const rangeLabel = classes.length > 0 ? `${classes[0]} - ${classes[classes.length - 1]}` : '';
+
           return (
             <button
               key={sec.id}
@@ -50,9 +58,9 @@ export default function SectionTabs({ activeSection, onSelectSection, showOvervi
                 {getIcon(sec.iconName)}
               </div>
               <div className="text-left">
-                <div className="leading-tight">{sec.shortName}</div>
+                <div className="leading-tight">{shortName}</div>
                 <div className={`text-[10px] font-medium opacity-90 ${isActive ? 'text-white' : 'text-slate-500 dark:text-slate-400'}`}>
-                  {sec.classList[0]} - {sec.classList[sec.classList.length - 1]}
+                  {rangeLabel}
                 </div>
               </div>
             </button>

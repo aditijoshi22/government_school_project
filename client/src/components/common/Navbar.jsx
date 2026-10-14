@@ -3,8 +3,8 @@ import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../context/AuthContext';
 import schoolConfig from '@shared/school.config';
-import { SECTIONS_CONFIG } from '@shared/sections.config';
-import { Menu, X, ChevronDown, Award, BookOpen, GraduationCap, Sparkles, UserCheck, LayoutDashboard, LogIn } from 'lucide-react';
+import { SECTIONS_CONFIG, getSectionSchoolName, getSectionName } from '@shared/sections.config';
+import { Menu, X, ChevronDown, Award, BookOpen, GraduationCap, Sparkles, LayoutDashboard, LogIn } from 'lucide-react';
 
 export default function Navbar() {
   const { t, i18n } = useTranslation();
@@ -13,9 +13,13 @@ export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [sectionsDropdownOpen, setSectionsDropdownOpen] = useState(false);
 
-  const isMarathi = i18n.language === 'mr';
-  const isHindi = i18n.language === 'hi';
-  const displayName = schoolConfig.projectName;
+  const currentLang = i18n.language?.startsWith('mr') ? 'mr' : i18n.language?.startsWith('hi') ? 'hi' : 'en';
+
+  const getDisplayName = () => {
+    if (currentLang === 'mr') return schoolConfig.nameMarathi || schoolConfig.projectName;
+    if (currentLang === 'hi') return schoolConfig.nameHindi || schoolConfig.projectName;
+    return schoolConfig.projectName;
+  };
 
   const getSectionIcon = (iconName) => {
     switch (iconName) {
@@ -27,15 +31,15 @@ export default function Navbar() {
   };
 
   const navLinks = [
-    { name: t('nav.home'), path: '/' },
-    { name: t('nav.about'), path: '/about' },
-    { name: t('nav.admissions'), path: '/admissions' },
-    { name: t('nav.examinations'), path: '/examinations' },
-    { name: t('nav.results'), path: '/results' },
-    { name: t('nav.notices'), path: '/notices' },
-    { name: t('nav.gallery'), path: '/gallery' },
-    { name: t('nav.staff'), path: '/staff' },
-    { name: t('nav.contact'), path: '/contact' }
+    { name: t('navbar.home', 'Home'), path: '/' },
+    { name: t('navbar.about', 'About Us'), path: '/about' },
+    { name: t('navbar.admissions', 'Admissions'), path: '/admissions' },
+    { name: t('navbar.examinations', 'Examinations'), path: '/examinations' },
+    { name: t('navbar.results', 'Results'), path: '/results' },
+    { name: t('navbar.notices', 'Notices'), path: '/notices' },
+    { name: t('navbar.gallery', 'Gallery'), path: '/gallery' },
+    { name: t('navbar.staff', 'Staff'), path: '/staff' },
+    { name: t('navbar.contact', 'Contact Us'), path: '/contact' }
   ];
 
   return (
@@ -43,17 +47,17 @@ export default function Navbar() {
       {/* Brand Header */}
       <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
         <Link to="/" className="flex items-center gap-3 group">
-          <div className="w-12 h-12 rounded-full bg-slate-900 text-amber-400 border-2 border-amber-400 flex items-center justify-center font-bold text-lg shadow">
+          <div className="w-12 h-12 rounded-full bg-slate-900 text-amber-400 border-2 border-amber-400 flex items-center justify-center font-bold text-lg shadow shrink-0">
             SS
           </div>
           <div>
-            <h1 className="text-lg md:text-xl font-bold text-slate-900 dark:text-white leading-tight group-hover:text-blue-700 dark:group-hover:text-blue-400 transition">
-              {displayName}
+            <h1 className="text-base sm:text-lg md:text-xl font-bold text-slate-900 dark:text-white leading-tight group-hover:text-blue-700 dark:group-hover:text-blue-400 transition">
+              {getDisplayName()}
             </h1>
-            <p className="text-xs text-slate-500 dark:text-slate-400 flex items-center gap-2">
-              <span>3 Schools</span>
+            <p className="text-xs text-slate-500 dark:text-slate-400 flex items-center gap-2 flex-wrap">
+              <span>{t('navbar.threeSchools', '3 Schools')}</span>
               <span className="inline-block w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-              <span className="font-medium text-emerald-700 dark:text-emerald-400">Primary • Secondary • Junior College</span>
+              <span className="font-medium text-emerald-700 dark:text-emerald-400">{t('navbar.levelsSubtitle', 'Primary • Secondary • Junior College')}</span>
             </p>
           </div>
         </Link>
@@ -66,7 +70,7 @@ export default function Navbar() {
               className="flex items-center gap-2 bg-slate-900 hover:bg-slate-800 text-white px-4 py-2 rounded-lg font-medium text-sm transition shadow-sm"
             >
               <LayoutDashboard className="w-4 h-4 text-amber-400" />
-              <span>{t('nav.dashboard')} ({user?.username})</span>
+              <span>{t('navbar.dashboard', 'Dashboard')} ({user?.username})</span>
             </Link>
           ) : (
             <Link
@@ -74,7 +78,7 @@ export default function Navbar() {
               className="flex items-center gap-2 bg-blue-700 hover:bg-blue-800 text-white px-4 py-2 rounded-lg font-medium text-sm transition shadow-sm"
             >
               <LogIn className="w-4 h-4 text-white" />
-              <span>{t('nav.login')}</span>
+              <span>{t('navbar.login', 'Portal Login')}</span>
             </Link>
           )}
         </div>
@@ -83,7 +87,7 @@ export default function Navbar() {
         <button
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           className="lg:hidden p-2 rounded-lg text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800"
-          aria-label="Toggle menu"
+          aria-label={t('navbar.menuToggle', 'Toggle navigation menu')}
         >
           {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
         </button>
@@ -96,12 +100,12 @@ export default function Navbar() {
             {/* Sections Dropdown */}
             <li className="relative group" onMouseEnter={() => setSectionsDropdownOpen(true)} onMouseLeave={() => setSectionsDropdownOpen(false)}>
               <button className="flex items-center gap-1.5 px-3 py-2.5 text-amber-400 hover:bg-slate-800 rounded-t transition font-semibold">
-                <span>{t('nav.sections')}</span>
+                <span>{t('navbar.sections', 'Our Schools')}</span>
                 <ChevronDown className="w-4 h-4" />
               </button>
 
               {sectionsDropdownOpen && (
-                <div className="absolute left-0 top-full w-96 bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100 rounded-b-xl shadow-xl border border-slate-200 dark:border-slate-800 py-2 z-50 animate-fadeIn">
+                <div className="absolute left-0 top-full w-96 bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100 rounded-b-xl shadow-xl border border-slate-200 dark:border-slate-800 py-2 z-50">
                   {SECTIONS_CONFIG.map((sec) => (
                     <Link
                       key={sec.id}
@@ -109,15 +113,15 @@ export default function Navbar() {
                       className="flex items-start gap-3 px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-800 transition"
                       onClick={() => setSectionsDropdownOpen(false)}
                     >
-                      <div className="mt-0.5 p-1.5 rounded-lg bg-slate-100 dark:bg-slate-800">
+                      <div className="mt-0.5 p-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 shrink-0">
                         {getSectionIcon(sec.iconName)}
                       </div>
                       <div>
                         <div className="font-semibold text-slate-900 dark:text-white text-sm" style={{ color: sec.themeColor }}>
-                          {sec.schoolName}
+                          {getSectionSchoolName(sec, currentLang)}
                         </div>
                         <div className="text-xs text-slate-500 dark:text-slate-400">
-                          {sec.schoolLevel} • {sec.classList[0]} to {sec.classList[sec.classList.length - 1]}
+                          {typeof sec.schoolLevel === 'object' ? (sec.schoolLevel[currentLang] || sec.schoolLevel.en) : sec.schoolLevel} • {sec.shortName?.[currentLang] || sec.shortName}
                         </div>
                       </div>
                     </Link>
@@ -149,7 +153,7 @@ export default function Navbar() {
               className="text-xs bg-amber-400 text-slate-900 font-bold px-3 py-1.5 rounded hover:bg-amber-300 transition flex items-center gap-1"
             >
               <Award className="w-3.5 h-3.5" />
-              {t('nav.studentCorner')}
+              {t('navbar.studentCorner', 'Student Corner')}
             </Link>
           </div>
         </div>
@@ -158,7 +162,9 @@ export default function Navbar() {
       {/* Mobile Drawer Navigation */}
       {mobileMenuOpen && (
         <div className="lg:hidden bg-slate-900 text-white px-4 py-4 space-y-3 border-t border-slate-800">
-          <div className="font-bold text-amber-400 text-xs uppercase tracking-wider px-2">Our Schools</div>
+          <div className="font-bold text-amber-400 text-xs uppercase tracking-wider px-2">
+            {t('navbar.sections', 'Our Schools')}
+          </div>
           <div className="grid grid-cols-1 gap-1">
             {SECTIONS_CONFIG.map((sec) => (
               <Link
@@ -168,7 +174,7 @@ export default function Navbar() {
                 className="flex items-center gap-2 px-3 py-2 rounded bg-slate-800 text-sm font-medium hover:bg-slate-700"
               >
                 {getSectionIcon(sec.iconName)}
-                <span>{sec.schoolName}</span>
+                <span>{getSectionSchoolName(sec, currentLang)}</span>
               </Link>
             ))}
           </div>
@@ -195,7 +201,7 @@ export default function Navbar() {
                 onClick={() => setMobileMenuOpen(false)}
                 className="w-full block text-center bg-amber-400 text-slate-900 font-bold py-2 rounded-lg text-sm"
               >
-                Go to Dashboard
+                {t('navbar.dashboard', 'Dashboard')}
               </Link>
             ) : (
               <Link
@@ -203,7 +209,7 @@ export default function Navbar() {
                 onClick={() => setMobileMenuOpen(false)}
                 className="w-full block text-center bg-blue-600 text-white font-bold py-2 rounded-lg text-sm"
               >
-                {t('nav.login')}
+                {t('navbar.login', 'Portal Login')}
               </Link>
             )}
           </div>

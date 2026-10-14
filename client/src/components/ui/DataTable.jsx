@@ -1,12 +1,18 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Search, ChevronLeft, ChevronRight, Inbox } from 'lucide-react';
 
-export default function DataTable({ columns, data, searchPlaceholder = "Search records...", actions }) {
+export default function DataTable({ columns, data, searchPlaceholder, actions }) {
+  const { t, i18n } = useTranslation();
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 8;
 
-  const filteredData = data.filter(item => {
+  const currentLang = i18n.language?.startsWith('mr') ? 'mr' : i18n.language?.startsWith('hi') ? 'hi' : 'en';
+
+  const defaultSearchPlaceholder = searchPlaceholder || t('common.search', 'Search records...');
+
+  const filteredData = (data || []).filter(item => {
     if (!searchTerm) return true;
     return Object.values(item).some(val =>
       String(val).toLowerCase().includes(searchTerm.toLowerCase())
@@ -16,6 +22,9 @@ export default function DataTable({ columns, data, searchPlaceholder = "Search r
   const totalPages = Math.ceil(filteredData.length / pageSize) || 1;
   const paginatedData = filteredData.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
+  const startRecord = filteredData.length > 0 ? (currentPage - 1) * pageSize + 1 : 0;
+  const endRecord = Math.min(currentPage * pageSize, filteredData.length);
+
   return (
     <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm overflow-hidden">
       {/* Search Header */}
@@ -24,7 +33,7 @@ export default function DataTable({ columns, data, searchPlaceholder = "Search r
           <Search className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
           <input
             type="text"
-            placeholder={searchPlaceholder}
+            placeholder={defaultSearchPlaceholder}
             value={searchTerm}
             onChange={(e) => {
               setSearchTerm(e.target.value);
@@ -64,7 +73,7 @@ export default function DataTable({ columns, data, searchPlaceholder = "Search r
                 <td colSpan={columns.length} className="py-12 text-center text-slate-400">
                   <div className="flex flex-col items-center justify-center gap-2">
                     <Inbox className="w-8 h-8 text-slate-300" />
-                    <p className="text-sm font-medium">No records matching query</p>
+                    <p className="text-sm font-medium">{t('common.noRecordsFound', 'No records matching query')}</p>
                   </div>
                 </td>
               </tr>
@@ -74,25 +83,35 @@ export default function DataTable({ columns, data, searchPlaceholder = "Search r
       </div>
 
       {/* Pagination Footer */}
-      <div className="p-4 bg-slate-50/50 dark:bg-slate-800/40 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between text-xs text-slate-500">
+      <div className="p-4 bg-slate-50/50 dark:bg-slate-800/40 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between text-xs text-slate-500 flex-wrap gap-2">
         <div>
-          Showing {filteredData.length > 0 ? (currentPage - 1) * pageSize + 1 : 0} to {Math.min(currentPage * pageSize, filteredData.length)} of {filteredData.length} records
+          {currentLang === 'mr'
+            ? `एकूण ${filteredData.length} पैकी ${startRecord} ते ${endRecord} नोंदी दर्शवित आहे`
+            : currentLang === 'hi'
+            ? `कुल ${filteredData.length} में से ${startRecord} से ${endRecord} रिकॉर्ड प्रदर्शित`
+            : `Showing ${startRecord} to ${endRecord} of ${filteredData.length} records`}
         </div>
         <div className="flex items-center gap-2">
           <button
             onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
             disabled={currentPage === 1}
             className="p-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 disabled:opacity-40"
+            aria-label={t('common.previous', 'Previous')}
           >
             <ChevronLeft className="w-4 h-4" />
           </button>
           <span className="font-semibold text-slate-900 dark:text-white px-2">
-            Page {currentPage} of {totalPages}
+            {currentLang === 'mr'
+              ? `पृष्ठ ${currentPage} / ${totalPages}`
+              : currentLang === 'hi'
+              ? `पृष्ठ ${currentPage} / ${totalPages}`
+              : `Page ${currentPage} of ${totalPages}`}
           </span>
           <button
             onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
             disabled={currentPage === totalPages}
             className="p-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 disabled:opacity-40"
+            aria-label={t('common.next', 'Next')}
           >
             <ChevronRight className="w-4 h-4" />
           </button>

@@ -1,16 +1,42 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import PageHeader from '../components/common/PageHeader';
 import schoolConfig from '@shared/school.config';
-import { ShieldCheck, Award, Target, Compass, Users, CheckCircle } from 'lucide-react';
+import { Target, Compass, Users } from 'lucide-react';
 
 export default function About() {
+  const { t, i18n } = useTranslation();
+  const currentLang = i18n.language?.startsWith('mr') ? 'mr' : i18n.language?.startsWith('hi') ? 'hi' : 'en';
+
+  const smcMembers = [
+    {
+      desig: currentLang === 'mr' ? 'मुख्याध्यापक / सचिव' : currentLang === 'hi' ? 'प्रधानाचार्य / सचिव' : 'Principal / Secretary',
+      name: schoolConfig.principal.name,
+      role: currentLang === 'mr' ? 'शाळा प्रमुख (M.Sc., M.Ed.)' : currentLang === 'hi' ? 'विद्यालय प्रमुख (M.Sc., M.Ed.)' : 'School Administrator (M.Sc., M.Ed.)'
+    },
+    {
+      desig: currentLang === 'mr' ? 'शाळा व्यवस्थापन समिती अध्यक्ष' : currentLang === 'hi' ? 'प्रबंधन समिति अध्यक्ष' : 'SMC President',
+      name: 'Shri. Rameshwar V. Gawande',
+      role: currentLang === 'mr' ? 'पालक प्रतिनिधी व सामाजिक कार्यकर्ते' : currentLang === 'hi' ? 'अभिभावक प्रतिनिधि एवं सामाजिक कार्यकर्ता' : 'Parent Representative & Community Leader'
+    },
+    {
+      desig: currentLang === 'mr' ? 'उपाध्यक्ष' : currentLang === 'hi' ? 'उपाध्यक्ष' : 'Vice President',
+      name: 'Smt. Mandakini S. Tayade',
+      role: currentLang === 'mr' ? 'ग्रामपंचायत महिला प्रतिनिधी' : currentLang === 'hi' ? 'ग्राम पंचायत महिला प्रतिनिधि' : 'Gram Panchayat Representative'
+    },
+    {
+      desig: currentLang === 'mr' ? 'शिक्षक प्रतिनिधी' : currentLang === 'hi' ? 'शिक्षक प्रतिनिधि' : 'Teacher Representative',
+      name: 'Shri. Gajanan V. Kulkarni',
+      role: currentLang === 'mr' ? 'माध्यमिक विभाग प्रमुख (M.Sc., B.Ed.)' : currentLang === 'hi' ? 'माध्यमिक विभाग प्रमुख (M.Sc., B.Ed.)' : 'Secondary Section Head (M.Sc., B.Ed.)'
+    }
+  ];
+
   return (
     <div className="space-y-12 pb-16">
       <PageHeader
-        title="About Our Institution"
-        titleMr="आमच्या शाळेविषयी माहिती"
-        subtitle="Shiksha Sahayak - School Information and Management. Wadgaon, Tq. Digras, Dist. Yavatmal."
-        badgeText="3 Schools • Primary • Secondary • Junior College"
+        title={t('about.pageTitle', 'About Our Institution')}
+        subtitle={t('about.pageSubtitle', 'History, Vision, Leadership and the 3 Academic Schools')}
+        badgeText={t('about.badge', 'Institutional Heritage')}
       />
 
       <div className="max-w-7xl mx-auto px-4 space-y-12">
@@ -18,18 +44,22 @@ export default function About() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
           <div className="lg:col-span-7 space-y-4 text-slate-700 dark:text-slate-300 text-sm leading-relaxed">
             <h2 className="text-2xl font-extrabold text-slate-900 dark:text-white">
-              60 Years of Educational Dedication
+              {t('about.historyTitle', '60 Years of Educational Dedication')}
             </h2>
             <p>
-              Established in {schoolConfig.establishedYear}, {schoolConfig.name} is a premier government institution managed under the Zilla Parishad educational council of Amravati District.
+              {t('about.historyP1', `Established in ${schoolConfig.establishedYear}, our institution stands as an educational beacon for students across Maharashtra.`)}
             </p>
             <p>
-              Over six decades, the institution has expanded from a modest primary facility into a full-fledged educational hub comprising <strong>Primary (Class 1-4)</strong>, <strong>Secondary (Class 5-10)</strong>, and <strong>Higher Secondary Junior College (Class 11-12)</strong> across Science, Commerce, and Arts streams.
+              {t('about.historyP2', 'Over six decades, the institution expanded into a full-fledged educational hub comprising Primary, Secondary, and Junior College.')}
             </p>
-            <div className="grid grid-cols-1 gap-4 pt-2">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
               <div className="bg-slate-100 dark:bg-slate-800 p-4 rounded-2xl">
-                <div className="font-bold text-slate-900 dark:text-white text-base">Medium of Instruction</div>
-                <div className="text-xs text-amber-600 dark:text-amber-400 font-semibold">{schoolConfig.medium}</div>
+                <div className="font-bold text-slate-900 dark:text-white text-base">{t('about.mediumTitle', 'Medium of Instruction')}</div>
+                <div className="text-xs text-amber-600 dark:text-amber-400 font-semibold">{t('about.mediumDesc', schoolConfig.medium)}</div>
+              </div>
+              <div className="bg-slate-100 dark:bg-slate-800 p-4 rounded-2xl">
+                <div className="font-bold text-slate-900 dark:text-white text-base">{t('about.hostelTitle', 'Residential Facility')}</div>
+                <div className="text-xs text-emerald-600 dark:text-emerald-400 font-semibold">{t('about.hostelDesc', 'Free boarding and lodging for tribal & rural students')}</div>
               </div>
             </div>
           </div>
@@ -37,7 +67,7 @@ export default function About() {
           <div className="lg:col-span-5">
             <img
               src="https://images.unsplash.com/photo-1541829070764-84a7d30dd3f3?auto=format&fit=crop&q=80&w=800"
-              alt="School Building"
+              alt={t('about.schoolBuildingAlt', 'School Building Campus')}
               className="rounded-3xl shadow-xl border-4 border-slate-200 dark:border-slate-800 object-cover w-full h-80"
             />
           </div>
@@ -50,10 +80,10 @@ export default function About() {
               <div className="p-3 bg-amber-500 text-slate-950 rounded-2xl font-bold">
                 <Target className="w-6 h-6" />
               </div>
-              <h3 className="text-xl font-bold text-slate-900 dark:text-white">Our Vision</h3>
+              <h3 className="text-xl font-bold text-slate-900 dark:text-white">{t('about.visionTitle', 'Our Vision')}</h3>
             </div>
             <p className="text-xs text-slate-700 dark:text-slate-300 leading-relaxed">
-              To provide affordable, accessible, and high-quality modern education to students from all economic backgrounds, enabling them to excel in national competitive examinations and become responsible citizens.
+              {t('about.visionDesc', 'To provide affordable, accessible, and high-quality modern education to students from all economic backgrounds, enabling them to excel in national competitive examinations and become responsible citizens.')}
             </p>
           </div>
 
@@ -62,10 +92,10 @@ export default function About() {
               <div className="p-3 bg-emerald-600 text-white rounded-2xl font-bold">
                 <Compass className="w-6 h-6" />
               </div>
-              <h3 className="text-xl font-bold text-slate-900 dark:text-white">Our Mission</h3>
+              <h3 className="text-xl font-bold text-slate-900 dark:text-white">{t('about.visionTitle', 'Our Mission')}</h3>
             </div>
             <p className="text-xs text-slate-700 dark:text-slate-300 leading-relaxed">
-              To foster critical thinking, digital literacy, scientific aptitude, and moral values through activity-based learning in early years, rigorous state board coaching in primary years, and specialized stream guidance in higher secondary.
+              {t('about.missionDesc', 'To foster critical thinking, digital literacy, scientific aptitude, and moral values through activity-based learning in early years, rigorous state board coaching in primary years, and specialized stream guidance in higher secondary.')}
             </p>
           </div>
         </div>
@@ -75,8 +105,12 @@ export default function About() {
           <div className="flex items-center gap-3 mb-6">
             <Users className="w-6 h-6 text-blue-600" />
             <div>
-              <h3 className="text-lg font-bold text-slate-900 dark:text-white">School Management Committee (SMC) & Authorities</h3>
-              <p className="text-xs text-slate-500">Government statutory governing body for school administration</p>
+              <h3 className="text-lg font-bold text-slate-900 dark:text-white">
+                {currentLang === 'mr' ? 'शाळा व्यवस्थापन समिती (SMC) व पदाधिकारी' : currentLang === 'hi' ? 'विद्यालय प्रबंधन समिति (SMC) एवं पदाधिकारी' : 'School Management Committee (SMC) & Authorities'}
+              </h3>
+              <p className="text-xs text-slate-500">
+                {currentLang === 'mr' ? 'शाळा प्रशासनासाठी शासकीय वैधानिक नियामक मंडळ' : currentLang === 'hi' ? 'विद्यालय प्रशासन हेतु वैधानिक निकाय' : 'Government statutory governing body for school administration'}
+              </p>
             </div>
           </div>
 
@@ -84,32 +118,19 @@ export default function About() {
             <table className="w-full text-left text-xs">
               <thead className="bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold uppercase">
                 <tr>
-                  <th className="p-3">Designation</th>
-                  <th className="p-3">Name</th>
-                  <th className="p-3">Role & Qualification</th>
+                  <th className="p-3">{t('staff.designation', 'Designation')}</th>
+                  <th className="p-3">{t('results.studentName', 'Name')}</th>
+                  <th className="p-3">{t('staff.qualification', 'Role & Qualification')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 dark:divide-slate-800 text-slate-700 dark:text-slate-300">
-                <tr>
-                  <td className="p-3 font-semibold text-blue-600">Principal / Secretary</td>
-                  <td className="p-3 font-bold">{schoolConfig.principal.name}</td>
-                  <td className="p-3">{schoolConfig.principal.qualification}</td>
-                </tr>
-                <tr>
-                  <td className="p-3 font-semibold text-blue-600">SMC President</td>
-                  <td className="p-3 font-bold">Shri. Rameshwar V. Gawande</td>
-                  <td className="p-3">Parent Representative & Community Leader</td>
-                </tr>
-                <tr>
-                  <td className="p-3 font-semibold text-blue-600">Vice President</td>
-                  <td className="p-3 font-bold">Smt. Mandakini S. Tayade</td>
-                  <td className="p-3">Gram Panchayat Representative</td>
-                </tr>
-                <tr>
-                  <td className="p-3 font-semibold text-blue-600">Teacher Representative</td>
-                  <td className="p-3 font-bold">Shri. Gajanan V. Kulkarni</td>
-                  <td className="p-3">Secondary Section Head (M.Sc., B.Ed.)</td>
-                </tr>
+                {smcMembers.map((m, idx) => (
+                  <tr key={idx}>
+                    <td className="p-3 font-semibold text-blue-600">{m.desig}</td>
+                    <td className="p-3 font-bold">{m.name}</td>
+                    <td className="p-3">{m.role}</td>
+                  </tr>
+                ))}
               </tbody>
             </table>
           </div>

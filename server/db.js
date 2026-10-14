@@ -288,31 +288,85 @@ export function initDatabase() {
       file_size TEXT DEFAULT '1.2 MB',
       updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
     );
+
+    CREATE TABLE IF NOT EXISTS facilities (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      title TEXT NOT NULL,
+      title_en TEXT,
+      title_mr TEXT,
+      title_hi TEXT,
+      description TEXT,
+      description_en TEXT,
+      description_mr TEXT,
+      description_hi TEXT,
+      icon TEXT,
+      color TEXT,
+      section_id TEXT
+    );
+
+    CREATE TABLE IF NOT EXISTS schemes (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      title TEXT NOT NULL,
+      title_en TEXT,
+      title_mr TEXT,
+      title_hi TEXT,
+      description TEXT,
+      description_en TEXT,
+      description_mr TEXT,
+      description_hi TEXT,
+      tag TEXT,
+      tag_en TEXT,
+      tag_mr TEXT,
+      tag_hi TEXT,
+      icon TEXT
+    );
   `);
 
   // Safe ALTER TABLE migrations for existing tables
   const alterQueries = [
     `ALTER TABLE notices ADD COLUMN title_en TEXT`,
     `ALTER TABLE notices ADD COLUMN title_mr TEXT`,
+    `ALTER TABLE notices ADD COLUMN title_hi TEXT`,
     `ALTER TABLE notices ADD COLUMN content_en TEXT`,
     `ALTER TABLE notices ADD COLUMN content_mr TEXT`,
+    `ALTER TABLE notices ADD COLUMN content_hi TEXT`,
     `ALTER TABLE events ADD COLUMN title_en TEXT`,
     `ALTER TABLE events ADD COLUMN title_mr TEXT`,
+    `ALTER TABLE events ADD COLUMN title_hi TEXT`,
     `ALTER TABLE events ADD COLUMN description_en TEXT`,
     `ALTER TABLE events ADD COLUMN description_mr TEXT`,
+    `ALTER TABLE events ADD COLUMN description_hi TEXT`,
     `ALTER TABLE gallery_albums ADD COLUMN title_en TEXT`,
     `ALTER TABLE gallery_albums ADD COLUMN title_mr TEXT`,
+    `ALTER TABLE gallery_albums ADD COLUMN title_hi TEXT`,
     `ALTER TABLE gallery_albums ADD COLUMN description_en TEXT`,
     `ALTER TABLE gallery_albums ADD COLUMN description_mr TEXT`,
+    `ALTER TABLE gallery_albums ADD COLUMN description_hi TEXT`,
+    `ALTER TABLE gallery_images ADD COLUMN caption_en TEXT`,
+    `ALTER TABLE gallery_images ADD COLUMN caption_mr TEXT`,
+    `ALTER TABLE gallery_images ADD COLUMN caption_hi TEXT`,
     `ALTER TABLE homework ADD COLUMN title_en TEXT`,
     `ALTER TABLE homework ADD COLUMN title_mr TEXT`,
+    `ALTER TABLE homework ADD COLUMN title_hi TEXT`,
     `ALTER TABLE homework ADD COLUMN description_en TEXT`,
     `ALTER TABLE homework ADD COLUMN description_mr TEXT`,
+    `ALTER TABLE homework ADD COLUMN description_hi TEXT`,
     `ALTER TABLE downloads ADD COLUMN description TEXT`,
     `ALTER TABLE downloads ADD COLUMN title_en TEXT`,
     `ALTER TABLE downloads ADD COLUMN title_mr TEXT`,
+    `ALTER TABLE downloads ADD COLUMN title_hi TEXT`,
     `ALTER TABLE downloads ADD COLUMN description_en TEXT`,
-    `ALTER TABLE downloads ADD COLUMN description_mr TEXT`
+    `ALTER TABLE downloads ADD COLUMN description_mr TEXT`,
+    `ALTER TABLE downloads ADD COLUMN description_hi TEXT`,
+    `ALTER TABLE teachers ADD COLUMN designation_en TEXT`,
+    `ALTER TABLE teachers ADD COLUMN designation_mr TEXT`,
+    `ALTER TABLE teachers ADD COLUMN designation_hi TEXT`,
+    `ALTER TABLE teachers ADD COLUMN qualification_en TEXT`,
+    `ALTER TABLE teachers ADD COLUMN qualification_mr TEXT`,
+    `ALTER TABLE teachers ADD COLUMN qualification_hi TEXT`,
+    `ALTER TABLE teachers ADD COLUMN department_en TEXT`,
+    `ALTER TABLE teachers ADD COLUMN department_mr TEXT`,
+    `ALTER TABLE teachers ADD COLUMN department_hi TEXT`
   ];
 
   alterQueries.forEach(q => {

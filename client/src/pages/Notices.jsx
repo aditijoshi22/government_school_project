@@ -2,12 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import axios from 'axios';
 import PageHeader from '../components/common/PageHeader';
-import { SECTIONS_CONFIG } from '@shared/sections.config';
+import { SECTIONS_CONFIG, getSectionName } from '@shared/sections.config';
 import { Bell, Search, FileText, Download, AlertCircle } from 'lucide-react';
-import { getLocalizedText } from '../utils/bilingual';
+import { getLocalizedText, formatLocalizedDate } from '../utils/bilingual';
 
 export default function Notices() {
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation(['notices', 'common']);
   const [notices, setNotices] = useState([]);
   const [selectedSection, setSelectedSection] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
@@ -15,7 +15,7 @@ export default function Notices() {
 
   useEffect(() => {
     setLoading(true);
-    axios.get(`/api/public/notices?section=${selectedSection}`)
+    axios.get(`/api/public/notices?section=${selectedSection}&lang=${i18n.language}`)
       .then(res => {
         if (res.data.success) {
           setNotices(res.data.data);
@@ -23,7 +23,7 @@ export default function Notices() {
       })
       .catch(err => console.error(err))
       .finally(() => setLoading(false));
-  }, [selectedSection]);
+  }, [selectedSection, i18n.language]);
 
   const filteredNotices = notices.filter(n => {
     const titleText = getLocalizedText(n, 'title', i18n.language) || '';
@@ -33,17 +33,17 @@ export default function Notices() {
       titleText.toLowerCase().includes(term) ||
       contentText.toLowerCase().includes(term) ||
       (n.title_en && n.title_en.toLowerCase().includes(term)) ||
-      (n.title_mr && n.title_mr.toLowerCase().includes(term))
+      (n.title_mr && n.title_mr.toLowerCase().includes(term)) ||
+      (n.title_hi && n.title_hi.toLowerCase().includes(term))
     );
   });
 
   return (
     <div className="space-y-12 pb-16">
       <PageHeader
-        title="Official Notices & Circulars"
-        titleMr="सूचना व शासकीय परिपत्रके"
-        subtitle="Stay updated with school announcements, examination timetables, and circulars."
-        badgeText="Official Updates"
+        title={t('notices.pageTitle')}
+        subtitle={t('notices.pageSubtitle')}
+        badgeText={t('notices.badge')}
       />
 
       <div className="max-w-7xl mx-auto px-4 space-y-8">
@@ -61,7 +61,7 @@ export default function Notices() {
                   : 'bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300'
               }`}
             >
-              All Notices
+              {t('common.allSections')}
             </button>
             {SECTIONS_CONFIG.map(s => (
               <button
@@ -77,7 +77,7 @@ export default function Notices() {
                   borderColor: selectedSection === s.id ? s.themeColor : undefined
                 }}
               >
-                {s.shortName}
+                {getSectionName(s, i18n.language)}
               </button>
             ))}
           </div>
@@ -87,7 +87,7 @@ export default function Notices() {
             <Search className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
             <input
               type="text"
-              placeholder={i18n.language === 'mr' ? 'सूचना शोधा...' : 'Search notices...'}
+              placeholder={t('common.search')}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full pl-9 pr-4 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white"
@@ -108,14 +108,16 @@ export default function Notices() {
                     <div className="flex items-center gap-2">
                       {notice.is_important === 1 && (
                         <span className="bg-rose-500 text-white font-extrabold text-[10px] px-2.5 py-0.5 rounded-full uppercase tracking-wider animate-pulse">
-                          {i18n.language === 'mr' ? 'महत्त्वाचे' : 'Important'}
+                          {t('common.badgeImportant')}
                         </span>
                       )}
                       <span className="bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300 font-semibold px-2.5 py-0.5 rounded-full uppercase text-[10px]">
                         {notice.category}
                       </span>
                     </div>
-                    <span className="text-slate-400">{notice.created_at?.split('T')[0] || notice.created_at}</span>
+                    <span className="text-slate-400 font-medium">
+                      {formatLocalizedDate(notice.created_at, i18n.language)}
+                    </span>
                   </div>
 
                   <h3 className="text-lg font-bold text-slate-900 dark:text-white leading-snug">
@@ -134,7 +136,7 @@ export default function Notices() {
                         className="inline-flex items-center gap-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-slate-900 dark:text-white font-bold text-xs px-4 py-2 rounded-xl transition border border-slate-200 dark:border-slate-700"
                       >
                         <FileText className="w-4 h-4 text-amber-500" />
-                        <span>{i18n.language === 'mr' ? 'शासकीय परिपत्रक (PDF) डाउनलोड करा' : 'Download Official PDF Circular'}</span>
+                        <span>{t('common.downloadPdf')}</span>
                         <Download className="w-3.5 h-3.5 text-slate-400 ml-1" />
                       </a>
                     </div>
@@ -144,7 +146,7 @@ export default function Notices() {
             })
           ) : (
             <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-12 text-center text-slate-400">
-              {i18n.language === 'mr' ? 'कोणतीही सूचना सापडली नाही.' : 'No notices matching your query.'}
+              {t('notices.noNotices')}
             </div>
           )}
         </div>
@@ -153,3 +155,4 @@ export default function Notices() {
     </div>
   );
 }
+
