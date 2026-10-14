@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../context/AuthContext';
+import schoolConfig from '@shared/school.config';
 import { LogIn, Key, User, AlertCircle } from 'lucide-react';
 
 export default function Login() {
@@ -41,7 +42,19 @@ export default function Login() {
       <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-8 shadow-2xl max-w-md w-full space-y-6">
 
         <div className="text-center space-y-2">
-          <div className="w-14 h-14 rounded-full bg-slate-900 text-amber-400 border-2 border-amber-400 mx-auto flex items-center justify-center font-extrabold text-xl shadow">
+          <img
+            src={schoolConfig.logoUrl}
+            alt="School Logo"
+            className="w-16 h-16 rounded-full object-cover border-2 border-amber-400 mx-auto shadow bg-white"
+            onError={(e) => {
+              e.currentTarget.style.display = 'none';
+              if (e.currentTarget.nextElementSibling) {
+                e.currentTarget.nextElementSibling.classList.remove('hidden');
+                e.currentTarget.nextElementSibling.classList.add('flex');
+              }
+            }}
+          />
+          <div className="w-14 h-14 rounded-full bg-slate-900 text-amber-400 border-2 border-amber-400 mx-auto hidden items-center justify-center font-extrabold text-xl shadow">
             ZP
           </div>
           <h2 className="text-2xl font-extrabold text-slate-900 dark:text-white">{t('auth.loginTitle')}</h2>

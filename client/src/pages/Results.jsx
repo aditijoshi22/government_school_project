@@ -97,7 +97,7 @@ export default function Results() {
                 className="w-full p-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white"
               >
                 {currentSection.classes.map(c => (
-                  <option key={c} value={c}>{t('results.selectClass')} {formatLocalizedNumber(c, i18n.language)}</option>
+                  <option key={c} value={c}>{t('common.class', 'Class')} {formatLocalizedNumber(c, i18n.language)}</option>
                 ))}
               </select>
             </div>
@@ -161,7 +161,12 @@ export default function Results() {
             <div id="printable-area" className="bg-white text-slate-900 border-4 border-slate-900 rounded-3xl p-8 shadow-2xl space-y-6">
               
               {/* Marksheet Header */}
-              <div className="border-b-2 border-slate-900 pb-6 text-center space-y-1">
+              <div className="border-b-2 border-slate-900 pb-6 text-center space-y-2">
+                <img
+                  src={schoolConfig.logoUrl}
+                  alt="School Logo"
+                  className="w-16 h-16 rounded-full mx-auto object-cover border border-slate-900 shadow-sm"
+                />
                 <div className="font-mono text-xs font-bold text-slate-500 uppercase tracking-widest">
                   {i18n.language === 'mr' ? 'महाराष्ट्र शासन • जिल्हा परिषद शिक्षण विभाग' : i18n.language === 'hi' ? 'महाराष्ट्र शासन • जिला परिषद शिक्षा विभाग' : 'GOVERNMENT OF MAHARASHTRA • ZILLA PARISHAD EDUCATION BOARD'}
                 </div>

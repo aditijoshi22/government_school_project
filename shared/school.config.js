@@ -25,7 +25,7 @@ const schoolConfig = {
     address: "Wadgaon, Tq. Digras, Dist. Yavatmal",
     phone: "+91 721 2345678",
     altPhone: "+91 94228 12345",
-    email: "vjnt@gmail.com",
+    email: "adarshvjnt@gmail.com",
     officeHours: "Monday to Saturday: 9:30 AM - 5:00 PM",
     googleMapsEmbedUrl: "https://www.google.com/maps?q=Wadgaon,+Digras,+Yavatmal,+Maharashtra&output=embed"
   },
@@ -39,7 +39,7 @@ const schoolConfig = {
     youtube: "https://youtube.com",
     twitter: "https://twitter.com"
   },
-  logoUrl: "/assets/school-logo.svg",
+  logoUrl: "/assets/school-logo.jpeg",
   stats: {
     totalStudents: 1280,
     totalTeachers: 48,
