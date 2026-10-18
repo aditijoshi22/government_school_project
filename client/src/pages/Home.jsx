@@ -258,25 +258,41 @@ export default function Home() {
       <section className="max-w-7xl mx-auto px-4">
         <div className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-3xl p-8 text-white shadow-xl grid grid-cols-1 md:grid-cols-12 gap-8 items-center border border-slate-700">
           <div className="md:col-span-4 flex flex-col items-center text-center">
-            <img
-              src={schoolConfig.principal.photo}
-              alt={schoolConfig.principal.name}
-              className="w-40 h-40 rounded-full object-cover border-4 border-amber-400 shadow-xl mb-4"
-            />
-            <h3 className="font-bold text-lg text-white">{schoolConfig.principal.name}</h3>
-            <p className="text-xs text-amber-400">{schoolConfig.principal.qualification}</p>
-            <p className="text-[11px] text-slate-400 mt-1">{schoolConfig.principal.experience}</p>
+            <div className="relative mb-4 group">
+              <div className="absolute -inset-1 bg-gradient-to-tr from-amber-500 to-amber-300 rounded-2xl blur opacity-30 group-hover:opacity-60 transition duration-300"></div>
+              <div className="relative w-44 h-52 sm:w-48 sm:h-56 rounded-2xl overflow-hidden border-2 border-amber-400 shadow-2xl bg-slate-950">
+                <img
+                  src={schoolConfig.principal.photo}
+                  alt={currentLang === 'mr' ? (schoolConfig.principal.nameMarathi || schoolConfig.principal.name) : currentLang === 'hi' ? (schoolConfig.principal.nameHindi || schoolConfig.principal.name) : schoolConfig.principal.name}
+                  className="w-full h-full object-cover object-top hover:scale-105 transition-transform duration-500"
+                />
+                <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-slate-950/90 via-slate-950/60 to-transparent p-2 text-center">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-amber-300 bg-amber-500/20 px-2.5 py-0.5 rounded-full border border-amber-400/40">
+                    {currentLang === 'mr' ? (schoolConfig.principal.designationMarathi || schoolConfig.principal.designation) : currentLang === 'hi' ? (schoolConfig.principal.designationHindi || schoolConfig.principal.designation) : schoolConfig.principal.designation}
+                  </span>
+                </div>
+              </div>
+            </div>
+            <h3 className="font-bold text-lg text-white">
+              {currentLang === 'mr' ? (schoolConfig.principal.nameMarathi || schoolConfig.principal.name) : currentLang === 'hi' ? (schoolConfig.principal.nameHindi || schoolConfig.principal.name) : schoolConfig.principal.name}
+            </h3>
+            <p className="text-xs text-amber-400 font-medium">
+              {currentLang === 'mr' ? (schoolConfig.principal.qualificationMarathi || schoolConfig.principal.qualification) : currentLang === 'hi' ? (schoolConfig.principal.qualificationHindi || schoolConfig.principal.qualification) : schoolConfig.principal.qualification}
+            </p>
+            <p className="text-[11px] text-slate-400 mt-1">
+              {currentLang === 'mr' ? (schoolConfig.principal.experienceMarathi || schoolConfig.principal.experience) : currentLang === 'hi' ? (schoolConfig.principal.experienceHindi || schoolConfig.principal.experience) : schoolConfig.principal.experience}
+            </p>
           </div>
 
           <div className="md:col-span-8 space-y-4">
             <span className="text-xs font-bold uppercase tracking-wider text-amber-400 bg-amber-400/10 px-3 py-1 rounded-full border border-amber-400/30">
-              {t('about.principalTitle', "Message from Principal's Desk")}
+              {t('about.principalDeskTitle', "Message from Principal's Desk")}
             </span>
             <h2 className="text-2xl font-bold leading-tight">
-              {t('home.heroTitle', '"Nurturing Character, Empowering Knowledge, Shaping Future Leaders"')}
+              "{t('about.principalQuote', 'Education is not just about books; it is the foundation of character, confidence, and nation-building.')}"
             </h2>
             <blockquote className="text-slate-300 text-sm leading-relaxed italic border-l-2 border-amber-400 pl-4 py-1">
-              "{t('about.principalMessage', schoolConfig.principal.message)}"
+              "{currentLang === 'mr' ? (schoolConfig.principal.messageMarathi || schoolConfig.principal.message) : currentLang === 'hi' ? (schoolConfig.principal.messageHindi || schoolConfig.principal.message) : schoolConfig.principal.message}"
             </blockquote>
             <Link to="/about" className="inline-flex items-center gap-2 text-amber-400 font-bold text-xs hover:underline pt-2">
               <span>{t('common.readMore', 'Read Full Message & History')}</span>

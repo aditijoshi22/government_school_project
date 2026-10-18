@@ -9,6 +9,7 @@ import { SECTIONS_CONFIG, getSectionById, getSectionName } from '@shared/section
 import { Users, GraduationCap, FileText, Bell, CheckCircle, XCircle, Plus, Sparkles } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { formatLocalizedNumber, formatLocalizedDate } from '../../utils/bilingual';
+import DashboardLoadingSkeleton from '../../components/common/DashboardLoadingSkeleton';
 
 export default function AdminDashboard({ user }) {
   const { t, i18n } = useTranslation(['dashboard', 'common', 'sections']);
@@ -182,6 +183,10 @@ export default function AdminDashboard({ user }) {
       )
     }
   ];
+
+  if (loading && !stats) {
+    return <DashboardLoadingSkeleton />;
+  }
 
   return (
     <div className="space-y-8 pb-16">

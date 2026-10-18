@@ -153,7 +153,7 @@ app.get('/api/public/gallery', (req, res) => {
     let query = `SELECT * FROM gallery_albums WHERE 1=1`;
     let params = [];
     if (section && section !== 'all') {
-      query += ` AND (section_id = ? OR section_id IS NULL)`;
+      query += ` AND section_id = ?`;
       params.push(section);
     }
     query += ` ORDER BY date DESC`;
@@ -784,36 +784,52 @@ app.post('/api/academics/progress-reports', authenticateToken, authorizeRoles('a
 // -------------------------------------------------------------
 app.get('/api/teacher/dashboard', authenticateToken, authorizeRoles('teacher'), (req, res) => {
   try {
-    const teacher = db.prepare(`SELECT * FROM teachers WHERE user_id = ?`).get(req.user.id);
+    let teacher = db.prepare(`SELECT * FROM teachers WHERE user_id = ?`).get(req.user.id);
     if (!teacher) {
-      return res.status(404).json({ success: false, message: 'Teacher profile not found' });
+      // Safe default profile for newly registered or unassigned teacher user
+      const userRecord = db.prepare(`SELECT * FROM users WHERE id = ?`).get(req.user.id);
+      teacher = {
+        id: null,
+        user_id: req.user.id,
+        employee_id: 'EMP-NEW',
+        full_name: userRecord?.username || 'Teacher',
+        designation: 'Teacher',
+        qualification: 'B.Ed.',
+        phone: '',
+        email: userRecord?.email || '',
+        photo: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=200',
+        department: 'General',
+        section_id: userRecord?.section_id || 'primary'
+      };
     }
 
-    const assignments = db.prepare(`SELECT * FROM teacher_assignments WHERE teacher_id = ?`).all(teacher.id);
+    const assignments = teacher.id
+      ? db.prepare(`SELECT * FROM teacher_assignments WHERE teacher_id = ?`).all(teacher.id) || []
+      : [];
 
     // Assigned students in teacher's section
-    const students = db.prepare(`
+    const students = teacher.section_id ? db.prepare(`
       SELECT * FROM students WHERE section_id = ? ORDER BY class_number ASC, roll_number ASC
-    `).all(teacher.section_id);
+    `).all(teacher.section_id) : [];
 
     // Relevant notices
-    const notices = db.prepare(`
+    const notices = teacher.section_id ? db.prepare(`
       SELECT * FROM notices WHERE section_id = ? OR section_id IS NULL ORDER BY created_at DESC
-    `).all(teacher.section_id);
+    `).all(teacher.section_id) : db.prepare(`SELECT * FROM notices WHERE section_id IS NULL ORDER BY created_at DESC`).all();
 
     // Timetable
-    const timetable = db.prepare(`
+    const timetable = teacher.section_id ? db.prepare(`
       SELECT * FROM timetable WHERE teacher_name LIKE ? OR section_id = ?
-    `).all(`%${teacher.full_name}%`, teacher.section_id);
+    `).all(`%${teacher.full_name}%`, teacher.section_id) : [];
 
     res.json({
       success: true,
       data: {
         teacher,
-        assignments,
-        students,
-        notices,
-        timetable
+        assignments: assignments || [],
+        students: students || [],
+        notices: notices || [],
+        timetable: timetable || []
       }
     });
   } catch (error) {

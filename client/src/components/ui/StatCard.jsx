@@ -9,19 +9,28 @@ export default function StatCard({ title, value, icon: Icon, color = "amber", tr
     rose: "bg-rose-500/10 text-rose-600 border-rose-200 dark:border-rose-900"
   };
 
+  const renderSafeContent = (val) => {
+    if (val === null || val === undefined) return '';
+    if (React.isValidElement(val)) return val;
+    if (typeof val === 'object') {
+      return val.en || val.mr || val.hi || Object.values(val)[0] || '';
+    }
+    return val;
+  };
+
   return (
     <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm hover:shadow-md transition">
       <div className="flex items-center justify-between">
         <div>
           <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1">
-            {title}
+            {renderSafeContent(title)}
           </p>
           <h3 className="text-2xl md:text-3xl font-extrabold text-slate-900 dark:text-white">
-            {value}
+            {renderSafeContent(value)}
           </h3>
           {subtitle && (
             <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-              {subtitle}
+              {renderSafeContent(subtitle)}
             </p>
           )}
         </div>
@@ -33,7 +42,7 @@ export default function StatCard({ title, value, icon: Icon, color = "amber", tr
       </div>
       {trend && (
         <div className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800 text-xs font-medium text-slate-600 dark:text-slate-400">
-          {trend}
+          {renderSafeContent(trend)}
         </div>
       )}
     </div>

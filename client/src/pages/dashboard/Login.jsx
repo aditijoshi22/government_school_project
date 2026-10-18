@@ -19,13 +19,14 @@ export default function Login() {
     setErrorMsg('');
     const res = await login(username, password);
     if (res.success) {
-      const role = res.user?.role?.toLowerCase();
+      const rawRole = res.user?.role || '';
+      const role = String(rawRole).toLowerCase().trim();
       if (['super_admin', 'section_admin', 'admin'].includes(role)) {
-        navigate('/dashboard/admin');
+        navigate('/dashboard/admin', { replace: true });
       } else if (role === 'teacher') {
-        navigate('/dashboard/teacher');
+        navigate('/dashboard/teacher', { replace: true });
       } else {
-        navigate('/dashboard/student');
+        navigate('/dashboard/student', { replace: true });
       }
     } else {
       setErrorMsg(res.message);

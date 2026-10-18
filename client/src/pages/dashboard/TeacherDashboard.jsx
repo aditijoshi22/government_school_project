@@ -4,12 +4,13 @@ import axios from 'axios';
 import StatCard from '../../components/ui/StatCard';
 import DataTable from '../../components/ui/DataTable';
 import Modal from '../../components/common/Modal';
-import { getSectionById, getSectionName } from '@shared/sections.config';
+import { getSectionById, getSectionName, getSectionShortName } from '@shared/sections.config';
 import { Users, GraduationCap, Bell, Plus, BookOpen, AlertCircle } from 'lucide-react';
 import { formatLocalizedDate, getLocalizedText } from '../../utils/bilingual';
+import DashboardLoadingSkeleton from '../../components/common/DashboardLoadingSkeleton';
 
 export default function TeacherDashboard({ user }) {
-  const { t, i18n } = useTranslation(['dashboard', 'common']);
+  const { t, i18n } = useTranslation(['dashboard', 'common', 'results', 'auth']);
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -70,7 +71,7 @@ export default function TeacherDashboard({ user }) {
       ...noticeForm,
       title: noticeForm.title_en || noticeForm.title_mr || noticeForm.title_hi,
       content: noticeForm.content_en || noticeForm.content_mr || noticeForm.content_hi,
-      section_id: data?.teacher?.section_id
+      section_id: data?.teacher?.section_id || user?.section_id || null
     }).then(res => {
       if (res.data.success) {
         setNoticeModalOpen(false);
@@ -118,18 +119,22 @@ export default function TeacherDashboard({ user }) {
   };
 
   if (loading) {
-    return (
-      <div className="py-20 text-center text-slate-500 animate-pulse">
-        {t('common.loading')}
-      </div>
-    );
+    return <DashboardLoadingSkeleton />;
   }
 
   if (error) {
     return (
-      <div className="p-6 bg-rose-50 border border-rose-200 rounded-3xl text-rose-800 text-sm flex items-center gap-3">
-        <AlertCircle className="w-5 h-5 text-rose-600 shrink-0" />
-        <span>{error}</span>
+      <div className="p-6 bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/60 rounded-3xl text-rose-800 dark:text-rose-200 text-sm flex items-center justify-between gap-3">
+        <div className="flex items-center gap-3">
+          <AlertCircle className="w-5 h-5 text-rose-600 shrink-0" />
+          <span>{error}</span>
+        </div>
+        <button
+          onClick={fetchTeacherData}
+          className="px-3 py-1.5 bg-rose-600 hover:bg-rose-500 text-white rounded-xl text-xs font-bold transition"
+        >
+          {t('common.retry', 'Retry')}
+        </button>
       </div>
     );
   }
@@ -179,7 +184,7 @@ export default function TeacherDashboard({ user }) {
         <div className="flex items-center gap-4">
           <img
             src={teacher?.photo || 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=200'}
-            alt={teacher?.full_name}
+            alt={teacher?.full_name || user?.username}
             className="w-16 h-16 rounded-full object-cover border-2 border-emerald-400 shadow-md"
           />
           <div>
@@ -187,11 +192,11 @@ export default function TeacherDashboard({ user }) {
               <span className="text-xs bg-emerald-500/20 text-emerald-300 font-bold px-2.5 py-0.5 rounded-full border border-emerald-400/30">
                 {t('dashboard.teacherDashboard')}
               </span>
-              <span className="text-xs text-slate-400">• ID: {teacher?.employee_id}</span>
+              <span className="text-xs text-slate-400">• ID: {teacher?.employee_id || 'N/A'}</span>
             </div>
-            <h1 className="text-2xl font-extrabold text-white mt-1">{teacher?.full_name}</h1>
+            <h1 className="text-2xl font-extrabold text-white mt-1">{teacher?.full_name || user?.username || 'Teacher'}</h1>
             <p className="text-xs text-slate-300">
-              {getLocalizedText(teacher, 'designation', i18n.language) || teacher?.designation} • {teacher?.department}
+              {getLocalizedText(teacher, 'designation', i18n.language) || teacher?.designation || 'Teacher'} • {teacher?.department || 'Faculty'}
             </p>
           </div>
         </div>
@@ -207,11 +212,40 @@ export default function TeacherDashboard({ user }) {
         </div>
       </div>
 
+      {/* Empty State Banner if no assignments yet */}
+      {assignments.length === 0 && (
+        <div className="p-4 bg-amber-50 dark:bg-amber-950/40 border border-amber-300 dark:border-amber-800 rounded-2xl flex items-center gap-3 text-amber-900 dark:text-amber-200 text-xs shadow-sm">
+          <AlertCircle className="w-5 h-5 text-amber-600 shrink-0" />
+          <div>
+            <span className="font-bold">{t('dashboard.noAssignmentsTitle', 'No classes assigned yet, contact admin')}</span>
+            <span className="ml-2 text-amber-700 dark:text-amber-300">{t('dashboard.noAssignmentsDesc', 'Contact admin to assign sections, classes, and subjects.')}</span>
+          </div>
+        </div>
+      )}
+
       {/* Stats row */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-        <StatCard title={t('dashboard.section')} value={getSectionName(section, i18n.language) || 'Primary'} icon={GraduationCap} color="emerald" subtitle={section?.shortName} />
-        <StatCard title={t('dashboard.totalStudents')} value={students.length} icon={Users} color="blue" subtitle={t('dashboard.studentRecords')} />
-        <StatCard title={t('dashboard.subject')} value={assignments.length || 2} icon={BookOpen} color="amber" subtitle="Active teaching assignments" />
+        <StatCard
+          title={t('dashboard.section')}
+          value={getSectionName(section, i18n.language) || 'Primary'}
+          icon={GraduationCap}
+          color="emerald"
+          subtitle={getSectionShortName(section, i18n.language) || getLocalizedText(section?.shortName, i18n.language) || ''}
+        />
+        <StatCard
+          title={t('dashboard.totalStudents')}
+          value={students.length}
+          icon={Users}
+          color="blue"
+          subtitle={t('dashboard.studentRecords')}
+        />
+        <StatCard
+          title={t('dashboard.subject')}
+          value={assignments.length}
+          icon={BookOpen}
+          color="amber"
+          subtitle={assignments.length > 0 ? "Active teaching assignments" : t('dashboard.noAssignmentsTitle', "No classes assigned yet")}
+        />
       </div>
 
       {/* Navigation Tabs */}

@@ -1,6 +1,16 @@
 {
-  "pageTitle": "Photo Gallery & Activities",
-  "pageSubtitle": "Memories of annual gatherings, sports meets, science exhibitions, and national festivals.",
-  "badge": "Campus Life",
-  "viewAlbum": "View Photo Album"
+  "pageTitle": "School Photo Gallery & Activities",
+  "pageSubtitle": "Explore vivid memories from tree plantation, annual gathering, sports & yoga, rangoli competition, and school heritage.",
+  "badge": "Campus Life & Memories",
+  "allCategories": "All Sections",
+  "viewAlbum": "View All Photos",
+  "openAlbum": "Open Album",
+  "photoCount": "Photos",
+  "albumsView": "Albums",
+  "photosView": "All Photos",
+  "searchPlaceholder": "Search photos...",
+  "closeViewer": "Close",
+  "nextPhoto": "Next",
+  "prevPhoto": "Previous",
+  "noImagesFound": "No photos found for this section."
 }

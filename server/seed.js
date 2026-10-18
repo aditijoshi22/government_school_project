@@ -1,6 +1,13 @@
 import bcrypt from 'bcryptjs';
 import db, { initDatabase } from './db.js';
 import { SECTIONS_CONFIG } from '../shared/sections.config.js';
+import { GALLERY_SECTIONS } from '../shared/gallery.config.js';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 console.log('🌱 Starting database seeding process with full Marathi & Hindi multilingual support...');
 
@@ -48,7 +55,8 @@ const usersData = [
   { username: 'teacher_anil', email: 'anil.shinde@mahaschool.gov.in', pass: teacherPass, role: 'teacher', section: 'high-school' },
   { username: 'student_aarav', email: 'aarav.sharma@parent.com', pass: studentPass, role: 'student_parent', section: 'primary' },
   { username: 'student_ananya', email: 'ananya.deshmukh@parent.com', pass: studentPass, role: 'student_parent', section: 'secondary' },
-  { username: 'student_rohit', email: 'rohit.patil@student.com', pass: studentPass, role: 'student_parent', section: 'high-school' }
+  { username: 'student_rohit', email: 'rohit.patil@student.com', pass: studentPass, role: 'student_parent', section: 'high-school' },
+  { username: 'teacher_unassigned', email: 'unassigned@mahaschool.gov.in', pass: teacherPass, role: 'teacher', section: 'primary' }
 ];
 
 usersData.forEach(u => {
@@ -142,6 +150,14 @@ const teachersList = [
     phone: '+91 97654 33221', email: 'anil.shinde@mahaschool.gov.in',
     deptEn: 'Physics & Higher Secondary Science', deptMr: 'भौतिकशास्त्र विभाग', deptHi: 'भौतिक विज्ञान संकाय',
     sec: 'high-school'
+  },
+  {
+    userId: 11, empId: 'EMP-004', name: 'Shri. Ramesh V. Jadhav',
+    desigEn: 'Assistant Teacher (Unassigned)', desigMr: 'सहायक शिक्षक (वर्ग वाटप प्रलंबित)', desigHi: 'सहायक शिक्षक (कक्षा आवंटन लंबित)',
+    qualEn: 'B.A., B.Ed.', qualMr: 'बी.ए., बी.एड.', qualHi: 'बी.ए., बी.एड.',
+    phone: '+91 94234 99999', email: 'unassigned@mahaschool.gov.in',
+    deptEn: 'Social Studies', deptMr: 'सामाजिक शास्त्रे विभाग', deptHi: 'सामाजिक विज्ञान संकाय',
+    sec: 'primary'
   }
 ];
 
@@ -352,36 +368,98 @@ console.log('✅ Seeded Admissions');
 const insertAlbum = db.prepare(`INSERT INTO gallery_albums (title, description, title_en, title_mr, title_hi, description_en, description_mr, description_hi, cover_image, section_id, date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`);
 const insertImage = db.prepare(`INSERT INTO gallery_images (album_id, image_url, caption, caption_en, caption_mr, caption_hi) VALUES (?, ?, ?, ?, ?, ?)`);
 
-const alb1 = insertAlbum.run(
-  'Independence Day Celebration 2026',
-  'Flag hoisting, parade and patriotic cultural performances by students of all sections.',
-  'Independence Day Celebration 2026',
-  'स्वातंत्र्य दिन सोहळा २०२६',
-  'स्वतंत्रता दिवस समारोह 2026',
-  'Flag hoisting, parade and patriotic cultural performances by students of all sections.',
-  'ध्वजारोहण, संचलन आणि तिन्ही विभागांतील विद्यार्थ्यांचे देशभक्तीपर सांस्कृतिक कार्यक्रम.',
-  'ध्वजारोहण, परेड एवं तीनों विभागों के विद्यार्थियों द्वारा देशभक्ति सांस्कृतिक प्रस्तुतियां।',
-  'https://images.unsplash.com/photo-1532375810709-75b1da00537c?auto=format&fit=crop&q=80&w=800',
-  null,
-  '2026-08-15'
-).lastInsertRowid;
-insertImage.run(alb1, 'https://images.unsplash.com/photo-1532375810709-75b1da00537c?auto=format&fit=crop&q=80&w=800', 'Flag hoisting ceremony by Principal', 'Flag hoisting ceremony by Principal', 'मुख्याध्यापकांच्या हस्ते ध्वजारोहण सोहळा', 'प्रधानाचार्य द्वारा ध्वजारोहण समारोह');
-insertImage.run(alb1, 'https://images.unsplash.com/photo-1509062522246-3755977927d7?auto=format&fit=crop&q=80&w=800', 'Students performing patriotic dance', 'Students performing patriotic dance', 'विद्यार्थ्यांचे देशभक्तीपर समूह नृत्य', 'छात्रों द्वारा देशभक्ति सामूहिक नृत्य');
+function formatPhotoCaption(filename, section, index) {
+  const baseName = filename.replace(/\.[^/.]+$/, "");
+  const isWhatsAppOrScreen = baseName.toLowerCase().startsWith('whatsapp') || baseName.toLowerCase().startsWith('screenshot');
 
-const alb2 = insertAlbum.run(
-  'Science Exhibition & Project Fair',
-  'Working models created by Secondary and High School students.',
-  'Science Exhibition & Project Fair',
-  'वार्षिक विज्ञान प्रदर्शन व प्रकल्प मेळावा',
-  'वार्षिक विज्ञान प्रदर्शनी एवं मॉडल मेला',
-  'Working models created by Secondary and High School students.',
-  'माध्यमिक व उच्च माध्यमिक विभागातील विद्यार्थ्यांनी साकारलेले नाविन्यपूर्ण विज्ञान प्रकल्प व प्रतिकृती.',
-  'माध्यमिक एवं उच्च माध्यमिक विद्यार्थियों द्वारा निर्मित कार्यशील विज्ञान मॉडल।',
-  'https://images.unsplash.com/photo-1567168544813-cc03465b4fa8?auto=format&fit=crop&q=80&w=800',
-  'high-school',
-  '2026-02-28'
-).lastInsertRowid;
-insertImage.run(alb2, 'https://images.unsplash.com/photo-1567168544813-cc03465b4fa8?auto=format&fit=crop&q=80&w=800', 'Robotics and solar model presentation', 'Robotics and solar model presentation', 'रोबोटिक्स व सौरऊर्जा प्रकल्प सादरीकरण', 'रोबोटिक्स एवं सौर ऊर्जा मॉडल प्रस्तुति');
+  if (!isWhatsAppOrScreen) {
+    const cleanEn = baseName
+      .replace(/[-_]/g, ' ')
+      .replace(/\s+/g, ' ')
+      .replace(/\b\w/g, c => c.toUpperCase())
+      .trim();
+
+    return {
+      en: cleanEn,
+      mr: `${section.name.mr} - ${cleanEn}`,
+      hi: `${section.name.hi} - ${cleanEn}`
+    };
+  }
+
+  const num = index + 1;
+  const sectionCaptions = {
+    'tree-plantation': {
+      en: `Tree Plantation Drive & Green Campus (${num})`,
+      mr: `वृक्षारोपण व हरित शाळा अभियान क्षणचित्र (${num})`,
+      hi: `पौधरोपण एवं हरित विद्यालय अभियान छायाचित्र (${num})`
+    },
+    'annual-gathering': {
+      en: `Annual Gathering Cultural Performance (${num})`,
+      mr: `वार्षिक स्नेहसंमेलन सांस्कृतिक कला सादरीकरण (${num})`,
+      hi: `वार्षिक स्नेह सम्मेलन सांस्कृतिक मंच प्रस्तुति (${num})`
+    },
+    'sports-yoga': {
+      en: `Sports & Athletics Meet Ground Moment (${num})`,
+      mr: `क्रीडा स्पर्धा व मैदानी खेळांचे क्षणचित्र (${num})`,
+      hi: `खेलकूद प्रतियोगिता एवं मैदानी खेल छायाचित्र (${num})`
+    },
+    'rangoli-competition': {
+      en: `Rangoli Competition Artwork by Students (${num})`,
+      mr: `विद्यार्थ्यांनी साकारलेली नयनरम्य रांगोळी कलाकृती (${num})`,
+      hi: `छात्रों द्वारा निर्मित सुंदर रंगोली कलाकृति (${num})`
+    },
+    'old-memories': {
+      en: `School Heritage & Golden Memories Archive (${num})`,
+      mr: `शाळेच्या सुवर्ण आठवणी व ऐतिहासिक गौरव क्षण (${num})`,
+      hi: `विद्यालय की स्वर्णिम स्मृतियां एवं गौरवशाली क्षण (${num})`
+    },
+    'science-exhibition': {
+      en: `Science Model & Innovation Exhibition (${num})`,
+      mr: `विज्ञान प्रदर्शन कार्यशील प्रकल्प सादरीकरण (${num})`,
+      hi: `विज्ञान प्रदर्शनी कार्यशील मॉडल प्रदर्शन (${num})`
+    },
+    'independence-day': {
+      en: `Independence Day Celebration & March Past (${num})`,
+      mr: `स्वातंत्र्य दिन ध्वजवंदन व प्रभातफेरी संचलन (${num})`,
+      hi: `स्वतंत्रता दिवस ध्वजारोहण एवं प्रभातफेरी (${num})`
+    }
+  };
+
+  return sectionCaptions[section.id] || {
+    en: `${section.name.en} Photo ${num}`,
+    mr: `${section.name.mr} छायाचित्र ${num}`,
+    hi: `${section.name.hi} छायाचित्र ${num}`
+  };
+}
+
+let totalSeededPhotos = 0;
+GALLERY_SECTIONS.forEach(sec => {
+  const albumId = insertAlbum.run(
+    sec.title.en,
+    sec.description.en,
+    sec.title.en,
+    sec.title.mr,
+    sec.title.hi,
+    sec.description.en,
+    sec.description.mr,
+    sec.description.hi,
+    sec.coverImage,
+    sec.id,
+    sec.date
+  ).lastInsertRowid;
+
+  const publicFolder = path.join(__dirname, '..', 'client', 'public', 'assets', 'school-images', sec.folder);
+  if (fs.existsSync(publicFolder)) {
+    const files = fs.readdirSync(publicFolder).filter(f => /\.(png|jpe?g|webp|gif)$/i.test(f));
+    files.forEach((file, idx) => {
+      const caps = formatPhotoCaption(file, sec, idx);
+      const imgUrl = `/assets/school-images/${sec.folder}/${file}`;
+      insertImage.run(albumId, imgUrl, caps.en, caps.en, caps.mr, caps.hi);
+      totalSeededPhotos++;
+    });
+  }
+});
+console.log(`📸 Successfully seeded ${GALLERY_SECTIONS.length} albums with ALL ${totalSeededPhotos} photos!`);
 
 // Seed Events
 const insertEvent = db.prepare(`INSERT INTO events (title, description, title_en, title_mr, title_hi, description_en, description_mr, description_hi, event_date, venue, section_id, image_url) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`);

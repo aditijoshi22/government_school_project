@@ -77,5 +77,7 @@
   "primarySectionCount": "Primary Progress Card Entry",
   "enterMarks": "Enter Marks / Grade",
   "activeContext": "Active School Context",
-  "day": "Day"
+  "day": "Day",
+  "noAssignmentsTitle": "No classes assigned yet, contact admin",
+  "noAssignmentsDesc": "Contact school administration to allocate sections, classes, and subjects to your profile."
 }

@@ -6,6 +6,8 @@ import { User, BookOpen, Calendar, Bell, Download, CheckSquare, AlertCircle, Awa
 import { getSectionName } from '@shared/sections.config';
 import { formatLocalizedNumber, formatLocalizedDate, getLocalizedText } from '../../utils/bilingual';
 
+import DashboardLoadingSkeleton from '../../components/common/DashboardLoadingSkeleton';
+
 export default function StudentDashboard({ user }) {
   const { t, i18n } = useTranslation(['dashboard', 'common', 'results']);
   const [data, setData] = useState(null);
@@ -34,18 +36,22 @@ export default function StudentDashboard({ user }) {
   };
 
   if (loading) {
-    return (
-      <div className="py-20 text-center text-slate-500 animate-pulse">
-        {t('common.loading')}
-      </div>
-    );
+    return <DashboardLoadingSkeleton />;
   }
 
   if (error) {
     return (
-      <div className="p-6 bg-rose-50 border border-rose-200 rounded-3xl text-rose-800 text-sm flex items-center gap-3">
-        <AlertCircle className="w-5 h-5 text-rose-600 shrink-0" />
-        <span>{error}</span>
+      <div className="p-6 bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/60 rounded-3xl text-rose-800 dark:text-rose-200 text-sm flex items-center justify-between gap-3">
+        <div className="flex items-center gap-3">
+          <AlertCircle className="w-5 h-5 text-rose-600 shrink-0" />
+          <span>{error}</span>
+        </div>
+        <button
+          onClick={fetchStudentData}
+          className="px-3 py-1.5 bg-rose-600 hover:bg-rose-500 text-white rounded-xl text-xs font-bold transition"
+        >
+          {t('common.retry', 'Retry')}
+        </button>
       </div>
     );
   }
