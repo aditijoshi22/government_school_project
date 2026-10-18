@@ -15,11 +15,22 @@ const schoolConfig = {
   medium: "Marathi / Semi-English",
   establishedYear: "1965",
   principal: {
-    name: "Shri. Rajeshwar M. Deshmukh",
-    qualification: "M.Sc. (Physics), M.Ed.",
-    experience: "24 Years in Educational Administration",
-    message: "Welcome to Zilla Parishad High School & Junior College, Anjangaon. Our institution is dedicated to nurturing young minds with quality education, moral values, and modern skills to empower students from all walks of life.",
-    photo: "https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&q=80&w=400"
+    name: "Mrs. Sunanda Kanake",
+    nameMarathi: "श्रीमती सुनंदा कणके",
+    nameHindi: "श्रीमती सुनंदा कणके",
+    qualification: "D.Ed., B.Ed. (English)",
+    qualificationMarathi: "डी.एड., बी.एड. (इंग्रजी)",
+    qualificationHindi: "डी.एड., बी.एड. (अंग्रेजी)",
+    designation: "Principal",
+    designationMarathi: "मुख्याध्यापिका",
+    designationHindi: "प्रधानाचार्या",
+    experience: "20+ Years in Educational Administration & Teaching",
+    experienceMarathi: "शैक्षणिक प्रशासन व अध्यापनाचा २०+ वर्षांचा अनुभव",
+    experienceHindi: "शैक्षणिक प्रशासन एवं अध्यापन का २०+ वर्षों का अनुभव",
+    message: "Welcome to our school. We are dedicated to nurturing young minds with quality education, moral values, and modern skills to empower every student for a bright future.",
+    messageMarathi: "आमच्या शाळेमध्ये आपले सहर्ष स्वागत. प्रत्येक विद्यार्थ्याला दर्जेदार शिक्षण, उच्च नैतिक संस्कार व आधुनिक कौशल्यांसह घडवून त्यांचे उज्ज्वल भविष्य निर्माण करण्यासाठी आम्ही कटिबद्ध आहोत.",
+    messageHindi: "हमारे विद्यालय में आपका हार्दिक स्वागत है। प्रत्येक विद्यार्थी को गुणवत्तापूर्ण शिक्षा, नैतिक संस्कार और आधुनिक कौशल प्रदान कर उनके स्वर्णिम भविष्य के निर्माण हेतु हम समर्पित हैं।",
+    photo: "/assets/principal.jpg"
   },
   contact: {
     address: "Wadgaon, Tq. Digras, Dist. Yavatmal",

@@ -10,9 +10,29 @@ export function normalizeLanguage(lang) {
   return 'en';
 }
 
-export function getLocalizedText(item, fieldName, currentLang = 'en') {
+export function getLocalizedText(item, fieldNameOrLang, currentLang = 'en') {
   if (!item) return '';
+
+  // If item is already a primitive string or number
+  if (typeof item !== 'object') return String(item);
+
+  // Case 1: getLocalizedText(obj, lang) where obj is { en: "...", mr: "...", hi: "..." }
+  const isDirectLangObj = ('en' in item || 'mr' in item || 'hi' in item);
+  const isLangString = typeof fieldNameOrLang === 'string' && (fieldNameOrLang.startsWith('en') || fieldNameOrLang.startsWith('mr') || fieldNameOrLang.startsWith('hi'));
+
+  if (isDirectLangObj && (isLangString || !fieldNameOrLang || currentLang === 'en')) {
+    const lang = normalizeLanguage(isLangString ? fieldNameOrLang : currentLang);
+    return item[lang] || item.en || item.mr || item.hi || '';
+  }
+
+  // Case 2: getLocalizedText(item, fieldName, currentLang)
+  const fieldName = fieldNameOrLang;
   const lang = normalizeLanguage(currentLang);
+
+  // If field is an object like { en: "...", mr: "...", hi: "..." }
+  if (typeof item[fieldName] === 'object' && item[fieldName] !== null) {
+    return item[fieldName][lang] || item[fieldName].en || item[fieldName].mr || item[fieldName].hi || '';
+  }
 
   // Field names mapping for title/content/description
   const keysByLang = {
@@ -20,11 +40,6 @@ export function getLocalizedText(item, fieldName, currentLang = 'en') {
     hi: [`${fieldName}_hi`, `${fieldName}Hi`, `${fieldName}_hi_IN`],
     en: [`${fieldName}_en`, `${fieldName}En`, fieldName]
   };
-
-  // If title/content is an object like { en: "...", mr: "...", hi: "..." }
-  if (typeof item[fieldName] === 'object' && item[fieldName] !== null) {
-    return item[fieldName][lang] || item[fieldName].en || '';
-  }
 
   // 1. Try preferred language
   const preferredKeys = keysByLang[lang] || [];
@@ -47,7 +62,7 @@ export function getLocalizedText(item, fieldName, currentLang = 'en') {
     return item[fieldName];
   }
   for (const l of ['mr', 'hi', 'en']) {
-    for (const k of keysByLang[l]) {
+    for (const k of (keysByLang[l] || [])) {
       if (item[k] && typeof item[k] === 'string' && item[k].trim() !== '') {
         return item[k];
       }

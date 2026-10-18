@@ -3,5 +3,10 @@
   "pageSubtitle": "Meet our dedicated headmasters, teachers, and administrative personnel across all three schools.",
   "badge": "Our Educators",
   "designation": "Designation",
-  "qualification": "Educational Qualification"
+  "qualification": "Educational Qualification",
+  "headOfInstitution": "Head of the Institution",
+  "headOfInstitutionDesc": "Supervising academic and administrative excellence across Primary, Secondary, and Junior College sections.",
+  "allStaffFilter": "All Faculty & Staff",
+  "experience": "Experience",
+  "administrativeOffice": "Principal's Office"
 }

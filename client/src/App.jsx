@@ -22,6 +22,7 @@ import Contact from './pages/Contact';
 import NotFound from './pages/NotFound';
 import Login from './pages/dashboard/Login';
 import DashboardLayout from './pages/dashboard/DashboardLayout';
+import ErrorBoundary from './components/common/ErrorBoundary';
 
 function PublicLayout() {
   return (
@@ -38,30 +39,32 @@ function PublicLayout() {
 
 export default function App() {
   return (
-    <Routes>
-      {/* Public Pages Layout */}
-      <Route element={<PublicLayout />}>
-        <Route path="/" element={<Home />} />
-        <Route path="/about" element={<About />} />
-        <Route path="/sections" element={<Sections />} />
-        <Route path="/sections/:sectionId" element={<Sections />} />
-        <Route path="/admissions" element={<Admissions />} />
-        <Route path="/examinations" element={<Examinations />} />
-        <Route path="/results" element={<Results />} />
-        <Route path="/staff" element={<Staff />} />
-        <Route path="/facilities" element={<Facilities />} />
-        <Route path="/notices" element={<Notices />} />
-        <Route path="/gallery" element={<Gallery />} />
-        <Route path="/student-corner" element={<StudentCorner />} />
-        <Route path="/government-schemes" element={<GovernmentSchemes />} />
-        <Route path="/downloads" element={<Downloads />} />
-        <Route path="/contact" element={<Contact />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="*" element={<NotFound />} />
-      </Route>
+    <ErrorBoundary>
+      <Routes>
+        {/* Public Pages Layout */}
+        <Route element={<PublicLayout />}>
+          <Route path="/" element={<Home />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/sections" element={<Sections />} />
+          <Route path="/sections/:sectionId" element={<Sections />} />
+          <Route path="/admissions" element={<Admissions />} />
+          <Route path="/examinations" element={<Examinations />} />
+          <Route path="/results" element={<Results />} />
+          <Route path="/staff" element={<Staff />} />
+          <Route path="/facilities" element={<Facilities />} />
+          <Route path="/notices" element={<Notices />} />
+          <Route path="/gallery" element={<Gallery />} />
+          <Route path="/student-corner" element={<StudentCorner />} />
+          <Route path="/government-schemes" element={<GovernmentSchemes />} />
+          <Route path="/downloads" element={<Downloads />} />
+          <Route path="/contact" element={<Contact />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="*" element={<NotFound />} />
+        </Route>
 
-      {/* Protected Dashboard Layout */}
-      <Route path="/dashboard/*" element={<DashboardLayout />} />
-    </Routes>
+        {/* Protected Dashboard Layout */}
+        <Route path="/dashboard/*" element={<DashboardLayout />} />
+      </Routes>
+    </ErrorBoundary>
   );
 }

@@ -400,12 +400,22 @@ const getClassLabel = (classNum, lang = 'en') => {
   return `Class ${num}`;
 };
 
+const getSectionShortName = (section, lang = 'en') => {
+  if (!section) return '';
+  const l = normalizeLang(lang);
+  if (typeof section.shortName === 'object' && section.shortName !== null) {
+    return section.shortName[l] || section.shortName.en || '';
+  }
+  return section.shortName || '';
+};
+
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = {
     SECTIONS_CONFIG,
     getSectionById,
     getSectionByClass,
     getSectionName,
+    getSectionShortName,
     getSectionDescription,
     getSectionSchoolName,
     getSectionClasses,
@@ -418,6 +428,7 @@ export {
   getSectionById,
   getSectionByClass,
   getSectionName,
+  getSectionShortName,
   getSectionDescription,
   getSectionSchoolName,
   getSectionClasses,
